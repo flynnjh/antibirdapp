@@ -1,5 +1,6 @@
 import {
   Button,
+  Dimensions,
   Image,
   Pressable,
   SafeAreaView,
@@ -16,7 +17,7 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
 
-  const searchUser = "awesomekling";
+  const searchUser = "00F800FF";
 
   const getUserInfo = (username) => {
     axios
@@ -32,11 +33,45 @@ export default function App() {
         },
       })
       .then((res) => {
-        const userInfo = {
-          info: res.data.data[0],
-          pinnedTweet: res?.data?.includes?.tweets[0],
-        };
-        setUser(userInfo);
+        if (res.data.errors) {
+          if (!res.data.errors[0].parameter === "pinned_tweet_id") {
+            const error = {
+              message: res.data.errors[0].detail,
+            };
+            setUser(null);
+            setError(error);
+            return;
+          }
+
+          if (res.data.errors[0].parameter === "usernames") {
+            const error = {
+              message: `User @${res.data.errors[0].resource_id} could not be found.`,
+            };
+            setUser(null);
+            setError(error);
+            return;
+          }
+        }
+
+        const url = res.data.data[0].profile_image_url;
+        let imageType = url.substring(url.length - 4);
+        let userProfileImage = url.substring(0, url.length - 10);
+        userProfileImage = userProfileImage + "400x400" + imageType;
+
+        if (res.data.data[0].protected) {
+          const userInfo = {
+            info: res.data.data[0],
+            profileImage: userProfileImage,
+          };
+          setUser(userInfo);
+        } else {
+          const userInfo = {
+            info: res.data.data[0],
+            pinnedTweet: res?.data?.includes?.tweets[0],
+            profileImage: userProfileImage,
+          };
+          setUser(userInfo);
+        }
       })
       .catch((error) => {
         setError(error);
@@ -51,7 +86,7 @@ export default function App() {
     <>
       <SafeAreaView style={styles.container}>
         {user ? (
-          <View style={{ padding: 20 }}>
+          <View style={{ padding: 20, width: Dimensions.get("window").width }}>
             <View style={{ paddingBottom: 20 }}>
               <View
                 style={{
@@ -65,9 +100,9 @@ export default function App() {
                   style={{
                     width: 65,
                     height: 65,
-                    borderRadius: 100,
+                    borderRadius: 65 / 2,
                   }}
-                  source={{ uri: user.info.profile_image_url }}
+                  source={{ uri: user.profileImage }}
                 />
                 <View
                   style={{ justifyContent: "center", alignItems: "center" }}
@@ -111,6 +146,11 @@ export default function App() {
                 </Text>
               </>
             ) : null}
+            {user.info.protected ? (
+              <View>
+                <Text>User is protected.</Text>
+              </View>
+            ) : null}
           </View>
         ) : error ? (
           <View>
@@ -122,7 +162,7 @@ export default function App() {
                 paddingBottom: 20,
               }}
             >
-              An erorr occurred :(
+              An error occurred :(
             </Text>
             <Text style={{ color: "black", fontSize: 16, fontWeight: "bold" }}>
               {error.message}
