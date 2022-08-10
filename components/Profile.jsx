@@ -2,8 +2,8 @@ import {
   Button,
   Dimensions,
   Image,
+  Platform,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
@@ -11,20 +11,20 @@ import {
 import { useEffect, useState } from "react";
 
 import { StatusBar } from "expo-status-bar";
+import { SvgUri } from "react-native-svg";
 import axios from "axios";
 
-export default function App() {
+export default function Profile(props) {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
-
-  const searchUser = "00F800FF";
 
   const getUserInfo = (username) => {
     axios
       .get(`https://api.twitter.com/2/users/by`, {
         params: {
           usernames: username,
-          "user.fields": "created_at,description,profile_image_url,protected",
+          "user.fields":
+            "created_at,description,profile_image_url,protected,verified,public_metrics",
           expansions: "pinned_tweet_id",
           "tweet.fields": "author_id,created_at",
         },
@@ -74,17 +74,18 @@ export default function App() {
         }
       })
       .catch((error) => {
+        console.log(error);
         setError(error);
       });
   };
 
   useEffect(() => {
-    getUserInfo(searchUser);
+    getUserInfo(props.username);
   }, []);
 
   return (
     <>
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         {user ? (
           <View style={{ padding: 20, width: Dimensions.get("window").width }}>
             <View style={{ paddingBottom: 20 }}>
@@ -92,15 +93,15 @@ export default function App() {
                 style={{
                   flexDirection: "row",
                   flexGrow: 1,
-                  maxHeight: 60,
-                  minHeight: 60,
+                  maxHeight: 120,
+                  minHeight: 120,
                 }}
               >
                 <Image
                   style={{
-                    width: 65,
-                    height: 65,
-                    borderRadius: 65 / 2,
+                    width: 120,
+                    height: 120,
+                    borderRadius: 120 / 2,
                   }}
                   source={{ uri: user.profileImage }}
                 />
@@ -111,7 +112,7 @@ export default function App() {
                     <Text
                       style={{
                         color: "black",
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: "bold",
                       }}
                     >
@@ -120,19 +121,55 @@ export default function App() {
                     <Text
                       style={{
                         color: "black",
-                        fontSize: 16,
-                        paddingBottom: 20,
+                        fontSize: 18,
                       }}
                     >
-                      @{user.info.username}
+                      @{user.info.username} {"\n"}
                     </Text>
                   </Text>
                 </View>
               </View>
+              <View style={{ paddingTop: 20, flexDirection: "row" }}>
+                <Text>
+                  <Text style={{ fontWeight: "bold" }}>
+                    {user.info.public_metrics.following_count}
+                  </Text>
+                  <Text> Following</Text>
+                </Text>
+                <Text style={{ paddingLeft: 20 }}>
+                  <Text style={{ fontWeight: "bold" }}>
+                    {user.info.public_metrics.followers_count}
+                  </Text>
+                  <Text> Followers</Text>
+                </Text>
+              </View>
             </View>
-            <Text style={{ color: "black", fontSize: 16, paddingBottom: 20 }}>
-              {user.info.description}
-            </Text>
+            {user.info.verified ? (
+              <View style={{ paddingBottom: 20 }}>
+                <Text>User is verified :O</Text>
+              </View>
+            ) : null}
+            {user.info.description ? (
+              <Text style={{ color: "black", fontSize: 16, paddingBottom: 20 }}>
+                {user.info.description}
+              </Text>
+            ) : null}
+            {user.info.protected ? (
+              <View style={{ paddingTop: 20 }}>
+                <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+                  These Tweets are protected.
+                </Text>
+                <Text style={{ fontSize: 16 }}>
+                  Only approved followers can see @{user.info.username}&apos;s
+                  Tweets.
+                </Text>
+              </View>
+            ) : null}
+            {user.info.public_metrics.tweet_count === 0 ? ( // only works if user never retweeted anything, will rework this later.
+              <Text style={{ fontSize: 28 }}>
+                @{user.info.username} hasn&apos;t tweeted.
+              </Text>
+            ) : null}
             {user.pinnedTweet ? (
               <>
                 <Text
@@ -145,11 +182,6 @@ export default function App() {
                   {user.pinnedTweet.text}
                 </Text>
               </>
-            ) : null}
-            {user.info.protected ? (
-              <View>
-                <Text>User is protected.</Text>
-              </View>
             ) : null}
           </View>
         ) : error ? (
@@ -175,18 +207,19 @@ export default function App() {
             </Text>
           </View>
         )}
-      </SafeAreaView>
+      </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  AndroidSafeArea: {
+    paddingTop: Platform.OS === "android" ? 50 : 0,
+  },
   container: {
     flex: 1,
     flexDirection: "column",
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
   button: {
     alignItems: "center",
