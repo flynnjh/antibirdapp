@@ -16,6 +16,7 @@ import axios from "axios";
 
 export default function Profile(props) {
   const [user, setUser] = useState(null);
+  const [tweets, setTweets] = useState(null);
   const [error, setError] = useState(null);
 
   const getUserInfo = (username) => {
@@ -65,13 +66,29 @@ export default function Profile(props) {
           };
           setUser(userInfo);
         } else {
-          const userInfo = {
-            info: res.data.data[0],
-            pinnedTweet: res?.data?.includes?.tweets[0],
-            profileImage: userProfileImage,
-          };
-          setUser(userInfo);
+          // gets users first five tweets, if meta.result_count is 0 then we know that the user actually doesn't have any tweets
+          axios
+            .get(
+              `https://api.twitter.com/2/users/${res.data.data[0].id}/tweets`,
+              {
+                params: {
+                  max_results: 5,
+                },
+                headers: {
+                  Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+                },
+              }
+            )
+            .then((res) => {
+              setTweets(res.data.meta.result_count);
+            });
         }
+        const userInfo = {
+          info: res.data.data[0],
+          pinnedTweet: res?.data?.includes?.tweets[0],
+          profileImage: userProfileImage,
+        };
+        setUser(userInfo);
       })
       .catch((error) => {
         console.log(error);
@@ -165,7 +182,7 @@ export default function Profile(props) {
                 </Text>
               </View>
             ) : null}
-            {user.info.public_metrics.tweet_count === 0 ? ( // only works if user never retweeted anything, will rework this later.
+            {tweets === 0 ? (
               <Text style={{ fontSize: 28 }}>
                 @{user.info.username} hasn&apos;t tweeted.
               </Text>
