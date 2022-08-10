@@ -22,7 +22,7 @@ export default function App() {
     </>
   );
 }
-
+// TODO: pass through styles as prop, so won't have to redeclare style sheet on every screen/component
 const styles = StyleSheet.create({
   AndroidSafeArea: {
     paddingTop: Platform.OS === "android" ? 50 : 0,

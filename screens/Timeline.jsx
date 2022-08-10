@@ -17,6 +17,7 @@ import axios from "axios";
 import moment from "moment";
 
 const Timeline = () => {
+  // TODO: Implement Timeline, lol
   return (
     <>
       <SafeAreaView style={[styles.AndroidSafeArea, styles.container]}>
