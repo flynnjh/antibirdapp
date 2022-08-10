@@ -1,13 +1,24 @@
-import { Platform, SafeAreaView, StyleSheet } from "react-native";
+import { Platform, SafeAreaView, StyleSheet, View } from "react-native";
 
-import Profile from "./components/Profile";
+import { NavigationContainer } from "@react-navigation/native";
+import ProfileScreen from "./screens/ProfileScreen";
+import TimelineScreen from "./screens/Timeline";
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 
 export default function App() {
+  const Tab = createMaterialBottomTabNavigator();
   return (
     <>
-      <SafeAreaView style={[styles.container, styles.AndroidSafeArea]}>
-        <Profile username="jamiepine"></Profile>
-      </SafeAreaView>
+      <NavigationContainer>
+        <Tab.Navigator>
+          <Tab.Screen name="Timeline" component={TimelineScreen} />
+          <Tab.Screen
+            name="Profile"
+            component={ProfileScreen}
+            initialParams={{ username: "jamiepine" }}
+          />
+        </Tab.Navigator>
+      </NavigationContainer>
     </>
   );
 }

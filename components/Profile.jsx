@@ -4,14 +4,13 @@ import {
   Image,
   Platform,
   Pressable,
+  SafeAreaView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { useEffect, useState } from "react";
 
-import { StatusBar } from "expo-status-bar";
-import { SvgUri } from "react-native-svg";
 import axios from "axios";
 import moment from "moment";
 
@@ -110,9 +109,9 @@ export default function Profile(props) {
 
   return (
     <>
-      <View style={styles.container}>
+      <SafeAreaView style={[styles.container, styles.AndroidSafeArea]}>
         {user ? (
-          <View style={{ padding: 20, width: Dimensions.get("window").width }}>
+          <View style={{ padding: 30, width: Dimensions.get("window").width }}>
             <View style={{ paddingBottom: 20 }}>
               <View
                 style={{
@@ -239,7 +238,7 @@ export default function Profile(props) {
             </Text>
           </View>
         )}
-      </View>
+      </SafeAreaView>
     </>
   );
 }
