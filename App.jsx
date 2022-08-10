@@ -15,7 +15,7 @@ export default function App() {
           <Tab.Screen
             name="Profile"
             component={ProfileScreen}
-            initialParams={{ username: "jamiepine" }}
+            initialParams={{ username: "donaldglover" }}
           />
         </Tab.Navigator>
       </NavigationContainer>

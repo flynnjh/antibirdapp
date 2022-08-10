@@ -1,23 +1,50 @@
 import {
   Button,
   Dimensions,
+  FlatList,
   Image,
   Platform,
   Pressable,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
 
 import axios from "axios";
 import moment from "moment";
 
+// TODO: Fix &amp; apprearing in Bio/Tweets
+// TODO: Implement Link Rendering and Opening
+// TODO: Implement Tweet Image Rendering
+// TODO: Handle @handle Linking
+// POTENTIAL: Implement Banner Rendering
+
 export default function Profile(props) {
   const [user, setUser] = useState(null);
   const [hasTweeted, setTweetedState] = useState(false);
+  const [userTweets, setUserTweets] = useState(null);
   const [error, setError] = useState(null);
+
+  const getUserTweets = (id) => {
+    axios
+      .get(`https://api.twitter.com/2/users/${id}/tweets`, {
+        params: {
+          max_results: "100",
+          "tweet.fields": "created_at,public_metrics",
+          exclude: "retweets,replies",
+        },
+        headers: {
+          Authorization:
+            "Bearer AAAAAAAAAAAAAAAAAAAAAEwVGwEAAAAAADxuXCHCIjgHYuS%2FjDv2%2Fv17Zb0%3DLq5RIGtCYKPEoTjAphdCx02SlsQtsxNoq5WMPz9AottLyBuZoX",
+        },
+      })
+      .then((res) => {
+        setUserTweets(res.data.data);
+      });
+  };
 
   const getUserInfo = (username) => {
     axios
@@ -153,18 +180,20 @@ export default function Profile(props) {
                   </Text>
                 </View>
               </View>
-              {user.formattedCreatedDate ? (
-                <View style={{ paddingTop: 20 }}>
-                  <Text style={{ fontSize: 16 }}>
-                    Joined {user.formattedCreatedDate}
-                  </Text>
-                </View>
-              ) : null}
-              {user.info.verified ? (
-                <View style={{ paddingTop: 5 }}>
-                  <Text>User is verified :O</Text>
-                </View>
-              ) : null}
+              <View style={{ paddingTop: 20 }}>
+                {user.info.verified ? (
+                  <View style={{ paddingTop: 20 }}>
+                    <Text>User is verified :O</Text>
+                  </View>
+                ) : null}
+                {user.formattedCreatedDate ? (
+                  <View>
+                    <Text style={{ fontSize: 16 }}>
+                      Joined {user.formattedCreatedDate}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
               <View style={{ paddingTop: 20, flexDirection: "row" }}>
                 <Text>
                   <Text style={{ fontWeight: "bold" }}>
@@ -201,10 +230,14 @@ export default function Profile(props) {
                 @{user.info.username} hasn&apos;t tweeted.
               </Text>
             ) : null}
-            {user.pinnedTweet ? (
+            {/* {user.pinnedTweet ? (
               <>
                 <Text
-                  style={{ color: "black", fontSize: 16, paddingBottom: 20 }}
+                  style={{
+                    color: "black",
+                    fontSize: 16,
+                    paddingBottom: 20,
+                  }}
                 >
                   📌 {user.pinnedTweet.created_at}
                 </Text>
@@ -213,6 +246,28 @@ export default function Profile(props) {
                   {user.pinnedTweet.text}
                 </Text>
               </>
+            ) : null} */}
+            <Pressable
+              style={[styles.button, { backgroundColor: "dodgerblue" }]}
+              onPress={() => {
+                getUserTweets(user.info.id);
+              }}
+            >
+              <Text
+                style={[
+                  {
+                    fontSize: 16,
+                    color: "white",
+                  },
+                ]}
+              >
+                Tweets ({user.info.public_metrics.tweet_count})
+              </Text>
+            </Pressable>
+            {userTweets ? (
+              <Text style={{ paddingTop: 20, fontSize: 16 }}>
+                {userTweets[0].text}
+              </Text>
             ) : null}
           </View>
         ) : error ? (
