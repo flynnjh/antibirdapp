@@ -6,7 +6,7 @@ export default function App() {
   return (
     <>
       <SafeAreaView style={[styles.container, styles.AndroidSafeArea]}>
-        <Profile username="senunnoj"></Profile>
+        <Profile username="jamiepine"></Profile>
       </SafeAreaView>
     </>
   );

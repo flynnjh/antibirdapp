@@ -13,10 +13,11 @@ import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { SvgUri } from "react-native-svg";
 import axios from "axios";
+import moment from "moment";
 
 export default function Profile(props) {
   const [user, setUser] = useState(null);
-  const [tweets, setTweets] = useState(null);
+  const [hasTweeted, setTweetedState] = useState(false);
   const [error, setError] = useState(null);
 
   const getUserInfo = (username) => {
@@ -80,11 +81,18 @@ export default function Profile(props) {
               }
             )
             .then((res) => {
-              setTweets(res.data.meta.result_count);
+              if (res.data.meta.result_count === 0) {
+                return;
+              } else {
+                setTweetedState(true);
+              }
             });
         }
         const userInfo = {
           info: res.data.data[0],
+          formattedCreatedDate: moment(res.data.data[0].created_at).format(
+            "MMMM D, YYYY"
+          ),
           pinnedTweet: res?.data?.includes?.tweets[0],
           profileImage: userProfileImage,
         };
@@ -146,6 +154,18 @@ export default function Profile(props) {
                   </Text>
                 </View>
               </View>
+              {user.formattedCreatedDate ? (
+                <View style={{ paddingTop: 20 }}>
+                  <Text style={{ fontSize: 16 }}>
+                    Joined {user.formattedCreatedDate}
+                  </Text>
+                </View>
+              ) : null}
+              {user.info.verified ? (
+                <View style={{ paddingTop: 5 }}>
+                  <Text>User is verified :O</Text>
+                </View>
+              ) : null}
               <View style={{ paddingTop: 20, flexDirection: "row" }}>
                 <Text>
                   <Text style={{ fontWeight: "bold" }}>
@@ -161,13 +181,8 @@ export default function Profile(props) {
                 </Text>
               </View>
             </View>
-            {user.info.verified ? (
-              <View style={{ paddingBottom: 20 }}>
-                <Text>User is verified :O</Text>
-              </View>
-            ) : null}
             {user.info.description ? (
-              <Text style={{ color: "black", fontSize: 16, paddingBottom: 20 }}>
+              <Text style={{ color: "black", fontSize: 18, paddingBottom: 20 }}>
                 {user.info.description}
               </Text>
             ) : null}
@@ -182,7 +197,7 @@ export default function Profile(props) {
                 </Text>
               </View>
             ) : null}
-            {tweets === 0 ? (
+            {!hasTweeted && !user.info.protected ? (
               <Text style={{ fontSize: 28 }}>
                 @{user.info.username} hasn&apos;t tweeted.
               </Text>
@@ -195,7 +210,7 @@ export default function Profile(props) {
                   📌 {user.pinnedTweet.created_at}
                 </Text>
 
-                <Text style={{ color: "black", fontSize: 16 }}>
+                <Text style={{ color: "black", fontSize: 18 }}>
                   {user.pinnedTweet.text}
                 </Text>
               </>
