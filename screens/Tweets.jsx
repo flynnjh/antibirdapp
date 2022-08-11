@@ -20,16 +20,18 @@ const Tweets = (props) => {
   const [userTweets, setUserTweets] = useState(null);
 
   const getUserTweets = (id) => {
+    const bearerToken = process.env.TWITTER_BEARER_TOKEN;
+    const todaysDate = moment().subtract(1, "month").toISOString();
     axios
       .get(`https://api.twitter.com/2/users/${id}/tweets`, {
         params: {
           max_results: "100",
           "tweet.fields": "created_at,public_metrics,entities,attachments",
           exclude: "retweets,replies",
+          start_time: todaysDate,
         },
         headers: {
-          Authorization:
-            "Bearer AAAAAAAAAAAAAAAAAAAAAEwVGwEAAAAAADxuXCHCIjgHYuS%2FjDv2%2Fv17Zb0%3DLq5RIGtCYKPEoTjAphdCx02SlsQtsxNoq5WMPz9AottLyBuZoX",
+          Authorization: `Bearer ${bearerToken}`,
         },
       })
       .then((res) => {
@@ -41,10 +43,10 @@ const Tweets = (props) => {
     getUserTweets(props.route.params.id);
   }, []);
 
-  const Item = (item) => {
+  const Tweet = (item) => {
     //TODO: MAKE THIS LOOK GOOD
     return (
-      <View style={{ padding: 20 }}>
+      <View style={{ padding: 30, width: Dimensions.get("window").width - 30 }}>
         <Text style={{ paddingTop: 20 }}>
           {item.tweet.text} {"\n"}
         </Text>
@@ -59,7 +61,7 @@ const Tweets = (props) => {
     );
   };
 
-  const renderItem = ({ item }) => <Item tweet={item} />;
+  const renderTweet = ({ item }) => <Tweet tweet={item} />;
 
   return (
     <>
@@ -74,11 +76,26 @@ const Tweets = (props) => {
         >
           <FlatList
             data={userTweets}
-            renderItem={renderItem}
+            renderItem={renderTweet}
             keyExtractor={(item) => item.id}
+            directionalLockEnabled={true}
+            showsHorizontalScrollIndicator={false}
           />
         </View>
-      ) : null}
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            padding: 20,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ fontSize: 16 }}>
+            no tweets from the last thirty days :(
+          </Text>
+        </View>
+      )}
     </>
   );
 };

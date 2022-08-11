@@ -10,7 +10,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 const ProfileStack = createStackNavigator();
 
 function ProfileStackScreen() {
-  const username = "tylerthecreator";
+  const username = "snazzyq";
   return (
     <ProfileStack.Navigator>
       <ProfileStack.Screen
@@ -19,7 +19,11 @@ function ProfileStackScreen() {
         initialParams={{ username: username }}
         options={{ headerShown: false }}
       />
-      <ProfileStack.Screen name="Tweets" component={TweetsScreen} />
+      <ProfileStack.Screen
+        name="Tweets"
+        component={TweetsScreen}
+        options={{ headerTitle: "Tweets from the last 30 days" }}
+      />
     </ProfileStack.Navigator>
   );
 }

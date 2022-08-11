@@ -36,6 +36,7 @@ export default function Profile(props) {
   const [isLoading, setLoading] = useState(true);
 
   const getUserInfo = (username) => {
+    const bearerToken = process.env.TWITTER_BEARER_TOKEN;
     axios
       .get(`https://api.twitter.com/2/users/by`, {
         params: {
@@ -46,7 +47,7 @@ export default function Profile(props) {
           "tweet.fields": "author_id,created_at",
         },
         headers: {
-          Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+          Authorization: `Bearer ${bearerToken}`,
         },
       })
       .then((res) => {
