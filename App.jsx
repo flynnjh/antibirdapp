@@ -10,16 +10,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 const ProfileStack = createStackNavigator();
 
 function ProfileStackScreen() {
-  // TODO: MOVE ALL INFO FETCHING HERE
-
-  // MY ID 1226124825334337536
-
-  // jamiepine ID 67126750
-  // donaldglover ID 19279990
-  // awesomekling ID 1118652581310545922
-
-  const username = "donaldglover";
-  const id = "19279990";
+  const username = "snazzyq";
   return (
     <ProfileStack.Navigator>
       <ProfileStack.Screen
@@ -28,11 +19,7 @@ function ProfileStackScreen() {
         initialParams={{ username: username }}
         options={{ headerShown: false }}
       />
-      <ProfileStack.Screen
-        name="Tweets"
-        component={TweetsScreen}
-        initialParams={{ id: id }}
-      />
+      <ProfileStack.Screen name="Tweets" component={TweetsScreen} />
     </ProfileStack.Navigator>
   );
 }

@@ -214,23 +214,25 @@ export default function Profile(props) {
             ) : null}
             <View style={{ paddingTop: 20 }} />
             {/* this is heere because i'm lazy */}
-            <Pressable
-              style={[styles.button, { backgroundColor: "dodgerblue" }]}
-              onPress={() => {
-                navigation.navigate("Tweets");
-              }}
-            >
-              <Text
-                style={[
-                  {
-                    fontSize: 16,
-                    color: "white",
-                  },
-                ]}
+            {!user.info.protected ? (
+              <Pressable
+                style={[styles.button, { backgroundColor: "dodgerblue" }]}
+                onPress={() => {
+                  navigation.navigate("Tweets", { id: user.info.id });
+                }}
               >
-                Tweets ({user.info.public_metrics.tweet_count})
-              </Text>
-            </Pressable>
+                <Text
+                  style={[
+                    {
+                      fontSize: 16,
+                      color: "white",
+                    },
+                  ]}
+                >
+                  Tweets ({user.info.public_metrics.tweet_count})
+                </Text>
+              </Pressable>
+            ) : null}
 
             {!hasTweeted && !user.info.protected ? (
               <Text style={{ fontSize: 28 }}>
