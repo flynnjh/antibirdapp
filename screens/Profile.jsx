@@ -30,8 +30,10 @@ export default function Profile(props) {
   const navigation = useNavigation();
 
   const [user, setUser] = useState(null);
+  const [isUser, setIsUser] = useState(false);
   const [hasTweeted, setTweetedState] = useState(false);
   const [error, setError] = useState(null);
+  const [isLoading, setLoading] = useState(true);
 
   const getUserInfo = (username) => {
     axios
@@ -39,7 +41,7 @@ export default function Profile(props) {
         params: {
           usernames: username,
           "user.fields":
-            "created_at,description,profile_image_url,protected,verified,public_metrics",
+            "created_at,description,profile_image_url,protected,verified,public_metrics,entities",
           expansions: "pinned_tweet_id",
           "tweet.fields": "author_id,created_at",
         },
@@ -110,6 +112,8 @@ export default function Profile(props) {
           profileImage: userProfileImage,
         };
         setUser(userInfo);
+        setIsUser(true);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -118,12 +122,21 @@ export default function Profile(props) {
   };
 
   useEffect(() => {
-    getUserInfo(props.route.params.username);
+    if (props.route.params.username) {
+      getUserInfo(props.route.params.username);
+    }
+    setLoading(false);
   }, []);
+
+  // implement search bar
+
+  // if user has not set username, show nothing and prompt to set user -> store in asyncstorage.
+  // otherwise, load username from async storage.
 
   return (
     <>
       <SafeAreaView style={[styles.container, styles.AndroidSafeArea]}>
+        {!isUser ? <Text>hello world</Text> : null}
         {user ? (
           <View style={{ padding: 30, width: Dimensions.get("window").width }}>
             <View style={{ paddingBottom: 20 }}>
@@ -213,7 +226,7 @@ export default function Profile(props) {
               </View>
             ) : null}
             <View style={{ paddingTop: 20 }} />
-            {/* this is heere because i'm lazy */}
+            {/* this is here because i'm lazy */}
             {!user.info.protected ? (
               <Pressable
                 style={[styles.button, { backgroundColor: "dodgerblue" }]}
@@ -273,13 +286,13 @@ export default function Profile(props) {
               {error.message}
             </Text>
           </View>
-        ) : (
+        ) : isLoading ? (
           <View>
             <Text style={{ color: "black", fontSize: 16, fontWeight: "bold" }}>
               Loading...
             </Text>
           </View>
-        )}
+        ) : null}
       </SafeAreaView>
     </>
   );

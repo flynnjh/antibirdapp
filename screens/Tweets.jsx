@@ -24,7 +24,7 @@ const Tweets = (props) => {
       .get(`https://api.twitter.com/2/users/${id}/tweets`, {
         params: {
           max_results: "100",
-          "tweet.fields": "created_at,public_metrics",
+          "tweet.fields": "created_at,public_metrics,entities,attachments",
           exclude: "retweets,replies",
         },
         headers: {
@@ -41,6 +41,26 @@ const Tweets = (props) => {
     getUserTweets(props.route.params.id);
   }, []);
 
+  const Item = (item) => {
+    //TODO: MAKE THIS LOOK GOOD
+    return (
+      <View style={{ padding: 20 }}>
+        <Text style={{ paddingTop: 20 }}>
+          {item.tweet.text} {"\n"}
+        </Text>
+        <Text>
+          {item.tweet.created_at} {"\n"}
+        </Text>
+        <Text>
+          <Text>{item.tweet.public_metrics.retweet_count} Retweets </Text>
+          <Text>{item.tweet.public_metrics.like_count} Likes </Text>
+        </Text>
+      </View>
+    );
+  };
+
+  const renderItem = ({ item }) => <Item tweet={item} />;
+
   return (
     <>
       {userTweets ? (
@@ -52,15 +72,11 @@ const Tweets = (props) => {
             justifyContent: "center",
           }}
         >
-          <Text style={{ fontSize: 16 }}>
-            {userTweets[0].text} {"\n"}
-          </Text>
-          <Text style={{ fontSize: 16 }}>
-            <Text>
-              {userTweets[0].public_metrics.retweet_count} retweets {"   "}
-            </Text>
-            <Text>{userTweets[0].public_metrics.like_count} likes</Text>
-          </Text>
+          <FlatList
+            data={userTweets}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+          />
         </View>
       ) : null}
     </>
