@@ -1,9 +1,41 @@
 import { Platform, SafeAreaView, StyleSheet, View } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
-import ProfileScreen from "./screens/ProfileScreen";
+import ProfileScreen from "./screens/Profile";
 import TimelineScreen from "./screens/Timeline";
+import TweetsScreen from "./screens/Tweets";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
+
+const ProfileStack = createStackNavigator();
+
+function ProfileStackScreen() {
+  // TODO: MOVE ALL INFO FETCHING HERE
+
+  // MY ID 1226124825334337536
+
+  // jamiepine ID 67126750
+  // donaldglover ID 19279990
+  // awesomekling ID 1118652581310545922
+
+  const username = "donaldglover";
+  const id = "19279990";
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen
+        name={username}
+        component={ProfileScreen}
+        initialParams={{ username: username }}
+        options={{ headerShown: false }}
+      />
+      <ProfileStack.Screen
+        name="Tweets"
+        component={TweetsScreen}
+        initialParams={{ id: id }}
+      />
+    </ProfileStack.Navigator>
+  );
+}
 
 export default function App() {
   const Tab = createMaterialBottomTabNavigator();
@@ -12,11 +44,7 @@ export default function App() {
       <NavigationContainer>
         <Tab.Navigator>
           <Tab.Screen name="Timeline" component={TimelineScreen} />
-          <Tab.Screen
-            name="Profile"
-            component={ProfileScreen}
-            initialParams={{ username: "donaldglover" }}
-          />
+          <Tab.Screen name="Profile" component={ProfileStackScreen} />
         </Tab.Navigator>
       </NavigationContainer>
     </>
@@ -30,7 +58,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },

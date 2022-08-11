@@ -11,8 +11,12 @@ import {
   Text,
   View,
 } from "react-native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { useDeferredValue, useEffect, useState } from "react";
 
+import { StackNavigator } from "@react-navigation/stack";
+import Timeline from "../screens/Timeline";
+import TweetsScreen from "../screens/Tweets";
 import axios from "axios";
 import moment from "moment";
 
@@ -23,28 +27,11 @@ import moment from "moment";
 // POTENTIAL: Implement Banner Rendering
 
 export default function Profile(props) {
+  const navigation = useNavigation();
+
   const [user, setUser] = useState(null);
   const [hasTweeted, setTweetedState] = useState(false);
-  const [userTweets, setUserTweets] = useState(null);
   const [error, setError] = useState(null);
-
-  const getUserTweets = (id) => {
-    axios
-      .get(`https://api.twitter.com/2/users/${id}/tweets`, {
-        params: {
-          max_results: "100",
-          "tweet.fields": "created_at,public_metrics",
-          exclude: "retweets,replies",
-        },
-        headers: {
-          Authorization:
-            "Bearer AAAAAAAAAAAAAAAAAAAAAEwVGwEAAAAAADxuXCHCIjgHYuS%2FjDv2%2Fv17Zb0%3DLq5RIGtCYKPEoTjAphdCx02SlsQtsxNoq5WMPz9AottLyBuZoX",
-        },
-      })
-      .then((res) => {
-        setUserTweets(res.data.data);
-      });
-  };
 
   const getUserInfo = (username) => {
     axios
@@ -131,7 +118,7 @@ export default function Profile(props) {
   };
 
   useEffect(() => {
-    getUserInfo(props.username);
+    getUserInfo(props.route.params.username);
   }, []);
 
   return (
@@ -225,6 +212,26 @@ export default function Profile(props) {
                 </Text>
               </View>
             ) : null}
+            <View style={{ paddingTop: 20 }} />
+            {/* this is heere because i'm lazy */}
+            <Pressable
+              style={[styles.button, { backgroundColor: "dodgerblue" }]}
+              onPress={() => {
+                navigation.navigate("Tweets");
+              }}
+            >
+              <Text
+                style={[
+                  {
+                    fontSize: 16,
+                    color: "white",
+                  },
+                ]}
+              >
+                Tweets ({user.info.public_metrics.tweet_count})
+              </Text>
+            </Pressable>
+
             {!hasTweeted && !user.info.protected ? (
               <Text style={{ fontSize: 28 }}>
                 @{user.info.username} hasn&apos;t tweeted.
@@ -247,28 +254,6 @@ export default function Profile(props) {
                 </Text>
               </>
             ) : null} */}
-            <Pressable
-              style={[styles.button, { backgroundColor: "dodgerblue" }]}
-              onPress={() => {
-                getUserTweets(user.info.id);
-              }}
-            >
-              <Text
-                style={[
-                  {
-                    fontSize: 16,
-                    color: "white",
-                  },
-                ]}
-              >
-                Tweets ({user.info.public_metrics.tweet_count})
-              </Text>
-            </Pressable>
-            {userTweets ? (
-              <Text style={{ paddingTop: 20, fontSize: 16 }}>
-                {userTweets[0].text}
-              </Text>
-            ) : null}
           </View>
         ) : error ? (
           <View>
