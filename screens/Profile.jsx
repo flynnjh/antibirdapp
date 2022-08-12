@@ -17,10 +17,10 @@ import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useDeferredValue, useEffect, useState } from "react";
 
+import PinnedTweetCard from "../components/PinnedTweetCard";
 import { StackNavigator } from "@react-navigation/stack";
 import { TWITTER_BEARER_TOKEN } from "@env";
 import Timeline from "../screens/Timeline";
-import TweetCard from "../components/TweetCard";
 import TweetsScreen from "../screens/Tweets";
 import axios from "axios";
 import moment from "moment";
@@ -90,7 +90,7 @@ export default function Profile(props) {
 
           const userInfo = {
             info: res.data.data[0],
-            formattedCreatedDate: moment(res.data.data[0].created_at).format(
+            createdAt: moment(res.data.data[0].created_at).format(
               "MMMM D, YYYY"
             ),
             profileImage: userProfileImage,
@@ -121,9 +121,9 @@ export default function Profile(props) {
                   return;
                 } else {
                   const recentInfo = {
-                    formattedCreatedDate: moment(
-                      res.data.data[0].created_at
-                    ).format("MMMM D, YYYY @ HH:MM"),
+                    createdAt: moment(res.data.data[0].created_at).format(
+                      "MMMM D, YYYY @ HH:MM"
+                    ),
                     tweet: res.data.data[0],
                     // isPinnedTweet: false,
                   };
@@ -142,13 +142,13 @@ export default function Profile(props) {
             const pinnedInfo = {
               createdAt: moment(
                 res?.data?.includes?.tweets[0].created_at
-              ).format("MMMM D, YYYY @ HH:MM"),
+              ).format("MMM D, YY"),
               tweet: res?.data?.includes?.tweets[0],
               // isPinnedTweet: true,
             };
             const userInfo = {
               info: res.data.data[0],
-              formattedCreatedDate: moment(res.data.data[0].created_at).format(
+              createdAt: moment(res.data.data[0].created_at).format(
                 "MMMM D, YYYY"
               ),
               pinnedTweet: pinnedInfo,
@@ -243,10 +243,10 @@ export default function Profile(props) {
                         {user.info.username}
                       </Text>
                     </View>
-                    {user.formattedCreatedDate ? (
+                    {user.createdAt ? (
                       <View style={{ paddingTop: 5 }}>
                         <Text style={{ fontSize: 14, fontWeight: "300" }}>
-                          Joined {user.formattedCreatedDate}
+                          Joined {user.createdAt}
                         </Text>
                       </View>
                     ) : null}
@@ -394,11 +394,14 @@ export default function Profile(props) {
                   >
                     {user.pinnedTweet.tweet ? (
                       <View>
-                        <TweetCard
+                        <PinnedTweetCard
                           props={{
                             user: user,
                             recentTweet: recentTweet,
-                            style: { padding: 30 },
+                            style: {
+                              paddingVertical: 20,
+                              paddingHorizontal: 30,
+                            },
                           }}
                         />
                       </View>

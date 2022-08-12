@@ -44,7 +44,6 @@ const Tweets = (props) => {
 
   useEffect(() => {
     getUserTweets(props.route.params.id);
-    console.log(props);
   }, []);
 
   const Tweet = (item) => {
