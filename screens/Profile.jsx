@@ -170,7 +170,12 @@ export default function Profile(props) {
             <View style={{ padding: 30, paddingBottom: 10 }}>
               <View style={{ flexDirection: "column" }}>
                 <View
-                  style={{ justifyContent: "center", alignItems: "center" }}
+                  style={{
+                    height: 120,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "row",
+                  }}
                 >
                   <Image
                     style={{
@@ -182,44 +187,36 @@ export default function Profile(props) {
                   />
                   <View
                     style={{
-                      paddingTop: 20,
+                      paddingLeft: 20,
                       flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      // justifyContent: "center",
+                      // alignItems: "center",
                     }}
                   >
-                    <Text style={{ fontSize: 32, fontWeight: "bold" }}>
+                    <Text style={{ fontSize: 28, fontWeight: "bold" }}>
                       {user.info.name}
                     </Text>
-                    <Text style={{ fontSize: 24 }}>
+                    <Text style={{ fontSize: 20 }}>
                       <Text style={{ fontWeight: "300" }}>
                         @{user.info.username}
                       </Text>
                     </Text>
                     {user.formattedCreatedDate ? (
                       <View style={{ paddingTop: 5 }}>
-                        <Text style={{ fontSize: 16, fontWeight: "300" }}>
+                        <Text style={{ fontSize: 14, fontWeight: "300" }}>
                           Joined {user.formattedCreatedDate}
+                        </Text>
+                      </View>
+                    ) : null}
+                    {user.info.verified ? (
+                      <View style={{ paddingTop: 2 }}>
+                        <Text style={{ fontSize: 14, fontWeight: "300" }}>
+                          User is verified :O
                         </Text>
                       </View>
                     ) : null}
                   </View>
                 </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                {user.info.verified ? (
-                  <View style={{ paddingTop: 5 }}>
-                    <Text style={{ fontSize: 16, fontWeight: "300" }}>
-                      User is verified :O
-                    </Text>
-                  </View>
-                ) : null}
               </View>
 
               <View
