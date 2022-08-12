@@ -25,17 +25,15 @@ import axios from "axios";
 import moment from "moment";
 
 const TweetCard = (props) => {
-  console.log(props.props.user);
-  console.log(props.props.recentTweet);
   return (
     <>
-      <View>
+      <View style={props.props.style}>
         {props.props.user.pinnedTweet ? (
           <View>
             <Text>📌 {props.props.user.pinnedTweet.createdAt}</Text>
+            <Text>{props.props.user.pinnedTweet.tweet.text}</Text>
           </View>
         ) : null}
-        <Text>{props.props.user.pinnedTweet.tweet.text}</Text>
       </View>
     </>
   );

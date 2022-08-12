@@ -393,9 +393,15 @@ export default function Profile(props) {
                     }}
                   >
                     {user.pinnedTweet.tweet ? (
-                      <TweetCard
-                        props={{ user: user, recentTweet: recentTweet }}
-                      />
+                      <View>
+                        <TweetCard
+                          props={{
+                            user: user,
+                            recentTweet: recentTweet,
+                            style: { padding: 30 },
+                          }}
+                        />
+                      </View>
                     ) : null}
                   </View>
                 </View>
