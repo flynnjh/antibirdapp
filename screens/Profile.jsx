@@ -3,6 +3,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  PixelRatio,
   Platform,
   PlatformColor,
   Pressable,
@@ -13,11 +14,13 @@ import {
   View,
 } from "react-native";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useDeferredValue, useEffect, useState } from "react";
 
 import { StackNavigator } from "@react-navigation/stack";
 import { TWITTER_BEARER_TOKEN } from "@env";
 import Timeline from "../screens/Timeline";
+import TweetCard from "../components/TweetCard";
 import TweetsScreen from "../screens/Tweets";
 import axios from "axios";
 import moment from "moment";
@@ -34,6 +37,7 @@ export default function Profile(props) {
   const [user, setUser] = useState(null);
   const [isUser, setIsUser] = useState(false);
   const [hasTweeted, setTweetedState] = useState(false);
+  const [userLink, setLinkInfo] = useState(false);
   const [recentTweet, setRecentTweet] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setLoading] = useState(true);
@@ -79,9 +83,18 @@ export default function Profile(props) {
         userProfileImage = userProfileImage + "400x400" + imageType;
 
         if (res.data.data[0].protected) {
+          console.log(res.data.data[0]);
+          const pinnedInfo = {
+            tweet: false,
+          };
+
           const userInfo = {
             info: res.data.data[0],
+            formattedCreatedDate: moment(res.data.data[0].created_at).format(
+              "MMMM D, YYYY"
+            ),
             profileImage: userProfileImage,
+            pinnedTweet: pinnedInfo,
           };
           setUser(userInfo);
           setIsUser(true);
@@ -111,17 +124,27 @@ export default function Profile(props) {
                     formattedCreatedDate: moment(
                       res.data.data[0].created_at
                     ).format("MMMM D, YYYY @ HH:MM"),
-                    info: res.data.data[0],
+                    tweet: res.data.data[0],
+                    // isPinnedTweet: false,
                   };
 
                   setRecentTweet(recentInfo);
                 }
               });
+
+            if (res?.data?.data[0]?.entities?.url) {
+              const link = {
+                link: res.data.data[0].entities.url,
+              };
+
+              setLinkInfo(link);
+            }
             const pinnedInfo = {
               createdAt: moment(
                 res?.data?.includes?.tweets[0].created_at
               ).format("MMMM D, YYYY @ HH:MM"),
               tweet: res?.data?.includes?.tweets[0],
+              // isPinnedTweet: true,
             };
             const userInfo = {
               info: res.data.data[0],
@@ -130,6 +153,7 @@ export default function Profile(props) {
               ),
               pinnedTweet: pinnedInfo,
               recentTweet: recentTweet,
+              bioLink: userLink,
               profileImage: userProfileImage,
             };
             setUser(userInfo);
@@ -168,7 +192,13 @@ export default function Profile(props) {
             }}
           >
             <View style={{ padding: 30, paddingBottom: 10 }}>
-              <View style={{ flexDirection: "column" }}>
+              <View
+                style={{
+                  flexDirection: "column",
+                  // backgroundColor: "red",
+                  width: Dimensions.get("window").width - 60,
+                }}
+              >
                 <View
                   style={{
                     height: 120,
@@ -193,14 +223,26 @@ export default function Profile(props) {
                       // alignItems: "center",
                     }}
                   >
-                    <Text style={{ fontSize: 28, fontWeight: "bold" }}>
+                    <Text
+                      style={{
+                        fontSize: 0.2 * Dimensions.get("window").width - 60,
+                        fontWeight: "bold",
+                      }}
+                    >
                       {user.info.name}
                     </Text>
-                    <Text style={{ fontSize: 20 }}>
-                      <Text style={{ fontWeight: "300" }}>
-                        @{user.info.username}
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={{ fontSize: 18, fontWeight: "300" }}>@</Text>
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "300",
+                          paddingLeft: 1.3,
+                        }}
+                      >
+                        {user.info.username}
                       </Text>
-                    </Text>
+                    </View>
                     {user.formattedCreatedDate ? (
                       <View style={{ paddingTop: 5 }}>
                         <Text style={{ fontSize: 14, fontWeight: "300" }}>
@@ -226,17 +268,17 @@ export default function Profile(props) {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ fontSize: 18, fontWeight: "300" }}>
+                <Text style={{ fontSize: 16, fontWeight: "300" }}>
                   <Text style={{ fontWeight: "bold" }}>
-                    {user.info.public_metrics.following_count}
+                    {user.info.public_metrics.following_count.toLocaleString()}
                   </Text>
                   <Text> Following</Text>
                 </Text>
                 <Text
-                  style={{ paddingLeft: 20, fontSize: 18, fontWeight: "300" }}
+                  style={{ paddingLeft: 20, fontSize: 16, fontWeight: "300" }}
                 >
                   <Text style={{ fontWeight: "bold" }}>
-                    {user.info.public_metrics.followers_count}
+                    {user.info.public_metrics.followers_count.toLocaleString()}
                   </Text>
                   <Text> Followers</Text>
                 </Text>
@@ -262,7 +304,7 @@ export default function Profile(props) {
                 </Text>
               </View>
             ) : null}
-            {user.info.entities ? (
+            {userLink ? (
               <View style={{ justifyContent: "center", alignItems: "center" }}>
                 <Text
                   style={{
@@ -274,37 +316,32 @@ export default function Profile(props) {
                 </Text>
               </View>
             ) : null}
-            {user.info.protected ? (
-              <View style={{ paddingTop: 20 }}>
-                <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-                  These Tweets are protected.
-                </Text>
-                <Text style={{ fontSize: 16 }}>
-                  Only approved followers can see @{user.info.username}&apos;s
-                  Tweets.
-                </Text>
-              </View>
-            ) : null}
-            <View style={{ paddingTop: 20 }} />
-            <View style={{ paddingBottom: 20, paddingHorizontal: 30 }}>
+            <View
+              style={{
+                paddingBottom: 20,
+                paddingHorizontal: 30,
+              }}
+            >
               {!user.info.protected && recentTweet ? (
-                <Pressable
-                  style={[styles.button, { backgroundColor: "dodgerblue" }]}
-                  onPress={() => {
-                    navigation.navigate("Tweets", { id: user.info.id });
-                  }}
-                >
-                  <Text
-                    style={[
-                      {
-                        fontSize: 16,
-                        color: "white",
-                      },
-                    ]}
+                <View style={{ paddingTop: 20 }}>
+                  <Pressable
+                    style={[styles.button, { backgroundColor: "dodgerblue" }]}
+                    onPress={() => {
+                      navigation.navigate("Tweets", { id: user.info.id });
+                    }}
                   >
-                    Tweets ({user.info.public_metrics.tweet_count})
-                  </Text>
-                </Pressable>
+                    <Text
+                      style={[
+                        {
+                          fontSize: 16,
+                          color: "white",
+                        },
+                      ]}
+                    >
+                      Tweets ({user.info.public_metrics.tweet_count})
+                    </Text>
+                  </Pressable>
+                </View>
               ) : null}
             </View>
 
@@ -324,6 +361,19 @@ export default function Profile(props) {
                   backgroundColor: "ghostwhite",
                 }}
               >
+                {user.info.protected ? (
+                  <View>
+                    <View style={{ flex: 1, padding: 30, paddingTop: 20 }}>
+                      <Text style={{ fontSize: 26, fontWeight: "bold" }}>
+                        These Tweets are protected.
+                      </Text>
+                      <Text style={{ fontSize: 20 }}>
+                        Only approved followers can see @{user.info.username}
+                        &apos;s Tweets.
+                      </Text>
+                    </View>
+                  </View>
+                ) : null}
                 {!recentTweet && !user.info.protected ? (
                   <View>
                     <View style={{ paddingTop: 40, flex: 1 }}>
@@ -333,7 +383,23 @@ export default function Profile(props) {
                     </View>
                   </View>
                 ) : null}
-                {user.pinnedTweet.tweet ? (
+                <View>
+                  <View
+                    style={{
+                      flex: 1,
+                      paddingTop: 10,
+                      // justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {user.pinnedTweet.tweet ? (
+                      <TweetCard
+                        props={{ user: user, recentTweet: recentTweet }}
+                      />
+                    ) : null}
+                  </View>
+                </View>
+                {/* {user.pinnedTweet.tweet ? (
                   <View>
                     <View
                       style={{
@@ -421,7 +487,7 @@ export default function Profile(props) {
                       </View>
                     </View>
                   </View>
-                ) : null}
+                ) : null} */}
               </View>
             </View>
           </View>
