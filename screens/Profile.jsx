@@ -196,6 +196,13 @@ export default function Profile(props) {
                         @{user.info.username}
                       </Text>
                     </Text>
+                    {user.formattedCreatedDate ? (
+                      <View style={{ paddingTop: 5 }}>
+                        <Text style={{ fontSize: 16, fontWeight: "300" }}>
+                          Joined {user.formattedCreatedDate}
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
                 </View>
               </View>
@@ -206,13 +213,6 @@ export default function Profile(props) {
                   alignItems: "center",
                 }}
               >
-                {user.formattedCreatedDate ? (
-                  <View style={{ paddingTop: 20 }}>
-                    <Text style={{ fontSize: 18, fontWeight: "300" }}>
-                      Joined {user.formattedCreatedDate}
-                    </Text>
-                  </View>
-                ) : null}
                 {user.info.verified ? (
                   <View style={{ paddingTop: 5 }}>
                     <Text style={{ fontSize: 16, fontWeight: "300" }}>
@@ -311,19 +311,20 @@ export default function Profile(props) {
               ) : null}
             </View>
 
-            {/* <View
+            <View
               style={{
                 paddingTop: 15,
-                borderBottomColor: "black",
+                borderBottomColor: "lightgrey",
                 borderBottomWidth: StyleSheet.hairlineWidth,
               }}
-            /> */}
+            />
             <View style={{ flex: 1 }}>
               <View
                 style={{
                   justifyContent: "center",
                   alignItems: "center",
-                  backgroundColor: PlatformColor("secondarySystemBackground"),
+                  // backgroundColor: PlatformColor("secondarySystemBackground"),
+                  backgroundColor: "ghostwhite",
                 }}
               >
                 {!recentTweet && !user.info.protected ? (
@@ -340,7 +341,7 @@ export default function Profile(props) {
                     <View
                       style={{
                         flex: 1,
-                        paddingTop: 40,
+                        paddingTop: 10,
                         // justifyContent: "center",
                         alignItems: "center",
                       }}
@@ -371,14 +372,14 @@ export default function Profile(props) {
                     <View
                       style={{
                         flex: 1,
-                        paddingTop: 40,
+                        paddingTop: 10,
                         alignItems: "center",
                       }}
                     >
                       <Text
                         style={{
                           color: "black",
-                          fontSize: 24,
+                          fontSize: 16,
                           paddingBottom: 20,
                         }}
                       >
@@ -388,7 +389,7 @@ export default function Profile(props) {
                       <Text
                         style={{
                           color: "black",
-                          fontSize: 20,
+                          fontSize: 16,
                           textAlign: "center",
                         }}
                       >
@@ -402,7 +403,7 @@ export default function Profile(props) {
                           justifyContent: "center",
                         }}
                       >
-                        <Text style={{ fontSize: 18, fontWeight: "300" }}>
+                        <Text style={{ fontSize: 14, fontWeight: "300" }}>
                           <Text style={{ fontWeight: "bold" }}>
                             {recentTweet.info.public_metrics.retweet_count}
                           </Text>
@@ -411,7 +412,7 @@ export default function Profile(props) {
                         <Text
                           style={{
                             paddingLeft: 20,
-                            fontSize: 18,
+                            fontSize: 14,
                             fontWeight: "300",
                           }}
                         >
@@ -457,7 +458,7 @@ export default function Profile(props) {
 
 const styles = StyleSheet.create({
   AndroidSafeArea: {
-    paddingTop: Platform.OS === "android" ? 50 : 0,
+    paddingTop: Platform.OS === "android" ? 30 : 0,
   },
   container: {
     flex: 1,
