@@ -13,34 +13,38 @@ import {
 } from "react-native";
 import { useDeferredValue, useEffect, useState } from "react";
 
+import { TWITTER_BEARER_TOKEN } from "@env";
 import axios from "axios";
 import moment from "moment";
 
 const Tweets = (props) => {
   const [userTweets, setUserTweets] = useState(null);
+  const [isLoading, setLoading] = useState(true);
 
   const getUserTweets = (id) => {
-    const bearerToken = process.env.TWITTER_BEARER_TOKEN;
     const todaysDate = moment().subtract(1, "month").toISOString();
+
     axios
       .get(`https://api.twitter.com/2/users/${id}/tweets`, {
         params: {
           max_results: "100",
-          "tweet.fields": "created_at,public_metrics,entities,attachments",
+          "tweet.fields": "created_at,public_metrics,attachments",
           exclude: "retweets,replies",
           start_time: todaysDate,
         },
         headers: {
-          Authorization: `Bearer ${bearerToken}`,
+          Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
         },
       })
       .then((res) => {
         setUserTweets(res.data.data);
+        setLoading(false);
       });
   };
 
   useEffect(() => {
     getUserTweets(props.route.params.id);
+    console.log(props);
   }, []);
 
   const Tweet = (item) => {
@@ -82,7 +86,7 @@ const Tweets = (props) => {
             showsHorizontalScrollIndicator={false}
           />
         </View>
-      ) : (
+      ) : !userTweets && !isLoading ? (
         <View
           style={{
             flex: 1,
@@ -95,7 +99,21 @@ const Tweets = (props) => {
             no tweets from the last thirty days :(
           </Text>
         </View>
-      )}
+      ) : isLoading ? (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <Text
+            style={{
+              color: "black",
+              fontSize: 16,
+              fontWeight: "bold",
+            }}
+          >
+            Loading...
+          </Text>
+        </View>
+      ) : null}
     </>
   );
 };

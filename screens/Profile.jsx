@@ -4,6 +4,7 @@ import {
   FlatList,
   Image,
   Platform,
+  PlatformColor,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -15,6 +16,7 @@ import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { useDeferredValue, useEffect, useState } from "react";
 
 import { StackNavigator } from "@react-navigation/stack";
+import { TWITTER_BEARER_TOKEN } from "@env";
 import Timeline from "../screens/Timeline";
 import TweetsScreen from "../screens/Tweets";
 import axios from "axios";
@@ -32,11 +34,11 @@ export default function Profile(props) {
   const [user, setUser] = useState(null);
   const [isUser, setIsUser] = useState(false);
   const [hasTweeted, setTweetedState] = useState(false);
+  const [recentTweet, setRecentTweet] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setLoading] = useState(true);
 
   const getUserInfo = (username) => {
-    const bearerToken = process.env.TWITTER_BEARER_TOKEN;
     axios
       .get(`https://api.twitter.com/2/users/by`, {
         params: {
@@ -47,7 +49,7 @@ export default function Profile(props) {
           "tweet.fields": "author_id,created_at",
         },
         headers: {
-          Authorization: `Bearer ${bearerToken}`,
+          Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
         },
       })
       .then((res) => {
@@ -82,39 +84,58 @@ export default function Profile(props) {
             profileImage: userProfileImage,
           };
           setUser(userInfo);
+          setIsUser(true);
         } else {
           // gets users first five tweets, if meta.result_count is 0 then we know that the user actually doesn't have any tweets
-          axios
-            .get(
-              `https://api.twitter.com/2/users/${res.data.data[0].id}/tweets`,
-              {
-                params: {
-                  max_results: 5,
-                },
-                headers: {
-                  Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
-                },
-              }
-            )
-            .then((res) => {
-              if (res.data.meta.result_count === 0) {
-                return;
-              } else {
-                setTweetedState(true);
-              }
-            });
+
+          if (res.data.data[0]) {
+            axios
+              .get(
+                `https://api.twitter.com/2/users/${res.data.data[0].id}/tweets`,
+                {
+                  params: {
+                    max_results: 5,
+                    "tweet.fields": "created_at,public_metrics,attachments",
+                    exclude: "retweets,replies",
+                  },
+                  headers: {
+                    Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+                  },
+                }
+              )
+              .then((res) => {
+                if (res.data.meta.result_count === 0) {
+                  return;
+                } else {
+                  const recentInfo = {
+                    formattedCreatedDate: moment(
+                      res.data.data[0].created_at
+                    ).format("MMMM D, YYYY @ HH:MM"),
+                    info: res.data.data[0],
+                  };
+
+                  setRecentTweet(recentInfo);
+                }
+              });
+            const pinnedInfo = {
+              createdAt: moment(
+                res?.data?.includes?.tweets[0].created_at
+              ).format("MMMM D, YYYY @ HH:MM"),
+              tweet: res?.data?.includes?.tweets[0],
+            };
+            const userInfo = {
+              info: res.data.data[0],
+              formattedCreatedDate: moment(res.data.data[0].created_at).format(
+                "MMMM D, YYYY"
+              ),
+              pinnedTweet: pinnedInfo,
+              recentTweet: recentTweet,
+              profileImage: userProfileImage,
+            };
+            setUser(userInfo);
+            setIsUser(true);
+          }
         }
-        const userInfo = {
-          info: res.data.data[0],
-          formattedCreatedDate: moment(res.data.data[0].created_at).format(
-            "MMMM D, YYYY"
-          ),
-          pinnedTweet: res?.data?.includes?.tweets[0],
-          profileImage: userProfileImage,
-        };
-        setUser(userInfo);
-        setIsUser(true);
-        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -126,6 +147,7 @@ export default function Profile(props) {
     if (props.route.params.username) {
       getUserInfo(props.route.params.username);
     }
+
     setLoading(false);
   }, []);
 
@@ -139,70 +161,83 @@ export default function Profile(props) {
       <SafeAreaView style={[styles.container, styles.AndroidSafeArea]}>
         {!isUser ? <Text>hello world</Text> : null}
         {user ? (
-          <View style={{ padding: 30, width: Dimensions.get("window").width }}>
-            <View style={{ paddingBottom: 20 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexGrow: 1,
-                  maxHeight: 120,
-                  minHeight: 120,
-                }}
-              >
-                <Image
-                  style={{
-                    width: 120,
-                    height: 120,
-                    borderRadius: 120 / 2,
-                  }}
-                  source={{ uri: user.profileImage }}
-                />
+          <View
+            style={{
+              flex: 1,
+              width: Dimensions.get("window").width,
+            }}
+          >
+            <View style={{ padding: 30, paddingBottom: 10 }}>
+              <View style={{ flexDirection: "column" }}>
                 <View
                   style={{ justifyContent: "center", alignItems: "center" }}
                 >
-                  <Text style={{ flexDirection: "column", paddingLeft: 20 }}>
-                    <Text
-                      style={{
-                        color: "black",
-                        fontSize: 18,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {user.info.name} {"\n"}
+                  <Image
+                    style={{
+                      width: 120,
+                      height: 120,
+                      borderRadius: 120 / 2,
+                    }}
+                    source={{ uri: user.profileImage }}
+                  />
+                  <View
+                    style={{
+                      paddingTop: 20,
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text style={{ fontSize: 32, fontWeight: "bold" }}>
+                      {user.info.name}
                     </Text>
-                    <Text
-                      style={{
-                        color: "black",
-                        fontSize: 18,
-                      }}
-                    >
-                      @{user.info.username} {"\n"}
+                    <Text style={{ fontSize: 24 }}>
+                      <Text style={{ fontWeight: "300" }}>
+                        @{user.info.username}
+                      </Text>
                     </Text>
-                  </Text>
+                  </View>
                 </View>
               </View>
-              <View style={{ paddingTop: 20 }}>
-                {user.info.verified ? (
-                  <View style={{ paddingTop: 20 }}>
-                    <Text>User is verified :O</Text>
-                  </View>
-                ) : null}
+              <View
+                style={{
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 {user.formattedCreatedDate ? (
-                  <View>
-                    <Text style={{ fontSize: 16 }}>
+                  <View style={{ paddingTop: 20 }}>
+                    <Text style={{ fontSize: 18, fontWeight: "300" }}>
                       Joined {user.formattedCreatedDate}
                     </Text>
                   </View>
                 ) : null}
+                {user.info.verified ? (
+                  <View style={{ paddingTop: 5 }}>
+                    <Text style={{ fontSize: 16, fontWeight: "300" }}>
+                      User is verified :O
+                    </Text>
+                  </View>
+                ) : null}
               </View>
-              <View style={{ paddingTop: 20, flexDirection: "row" }}>
-                <Text>
+
+              <View
+                style={{
+                  paddingTop: 20,
+                  flexDirection: "row",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "300" }}>
                   <Text style={{ fontWeight: "bold" }}>
                     {user.info.public_metrics.following_count}
                   </Text>
                   <Text> Following</Text>
                 </Text>
-                <Text style={{ paddingLeft: 20 }}>
+                <Text
+                  style={{ paddingLeft: 20, fontSize: 18, fontWeight: "300" }}
+                >
                   <Text style={{ fontWeight: "bold" }}>
                     {user.info.public_metrics.followers_count}
                   </Text>
@@ -211,9 +246,36 @@ export default function Profile(props) {
               </View>
             </View>
             {user.info.description ? (
-              <Text style={{ color: "black", fontSize: 18, paddingBottom: 20 }}>
-                {user.info.description}
-              </Text>
+              <View
+                style={{
+                  paddingHorizontal: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: "black",
+                    fontSize: 18,
+                    textAlign: "center",
+                    paddingBottom: 10,
+                  }}
+                >
+                  {user.info.description}
+                </Text>
+              </View>
+            ) : null}
+            {user.info.entities ? (
+              <View style={{ justifyContent: "center", alignItems: "center" }}>
+                <Text
+                  style={{
+                    color: "dodgerblue",
+                    fontSize: 18,
+                  }}
+                >
+                  {user.info.entities.url.urls[0].display_url}
+                </Text>
+              </View>
             ) : null}
             {user.info.protected ? (
               <View style={{ paddingTop: 20 }}>
@@ -227,49 +289,143 @@ export default function Profile(props) {
               </View>
             ) : null}
             <View style={{ paddingTop: 20 }} />
-            {/* this is here because i'm lazy */}
-            {!user.info.protected ? (
-              <Pressable
-                style={[styles.button, { backgroundColor: "dodgerblue" }]}
-                onPress={() => {
-                  navigation.navigate("Tweets", { id: user.info.id });
-                }}
-              >
-                <Text
-                  style={[
-                    {
-                      fontSize: 16,
-                      color: "white",
-                    },
-                  ]}
-                >
-                  Tweets ({user.info.public_metrics.tweet_count})
-                </Text>
-              </Pressable>
-            ) : null}
-
-            {!hasTweeted && !user.info.protected ? (
-              <Text style={{ fontSize: 28 }}>
-                @{user.info.username} hasn&apos;t tweeted.
-              </Text>
-            ) : null}
-            {/* {user.pinnedTweet ? (
-              <>
-                <Text
-                  style={{
-                    color: "black",
-                    fontSize: 16,
-                    paddingBottom: 20,
+            <View style={{ paddingBottom: 20, paddingHorizontal: 30 }}>
+              {!user.info.protected && recentTweet ? (
+                <Pressable
+                  style={[styles.button, { backgroundColor: "dodgerblue" }]}
+                  onPress={() => {
+                    navigation.navigate("Tweets", { id: user.info.id });
                   }}
                 >
-                  📌 {user.pinnedTweet.created_at}
-                </Text>
+                  <Text
+                    style={[
+                      {
+                        fontSize: 16,
+                        color: "white",
+                      },
+                    ]}
+                  >
+                    Tweets ({user.info.public_metrics.tweet_count})
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
 
-                <Text style={{ color: "black", fontSize: 18 }}>
-                  {user.pinnedTweet.text}
-                </Text>
-              </>
-            ) : null} */}
+            {/* <View
+              style={{
+                paddingTop: 15,
+                borderBottomColor: "black",
+                borderBottomWidth: StyleSheet.hairlineWidth,
+              }}
+            /> */}
+            <View style={{ flex: 1 }}>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: PlatformColor("secondarySystemBackground"),
+                }}
+              >
+                {!recentTweet && !user.info.protected ? (
+                  <View>
+                    <View style={{ paddingTop: 40, flex: 1 }}>
+                      <Text style={{ fontSize: 24, fontWeight: "300" }}>
+                        @{user.info.username} hasn&apos;t tweeted.
+                      </Text>
+                    </View>
+                  </View>
+                ) : null}
+                {user.pinnedTweet.tweet ? (
+                  <View>
+                    <View
+                      style={{
+                        flex: 1,
+                        paddingTop: 40,
+                        // justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: "black",
+                          fontSize: 18,
+                          paddingBottom: 20,
+                        }}
+                      >
+                        📌 {user.pinnedTweet.createdAt}
+                      </Text>
+
+                      <Text
+                        style={{
+                          color: "black",
+                          fontSize: 16,
+                          textAlign: "center",
+                        }}
+                      >
+                        {user.pinnedTweet.tweet.text}
+                      </Text>
+                    </View>
+                  </View>
+                ) : recentTweet ? (
+                  <View>
+                    <View
+                      style={{
+                        flex: 1,
+                        paddingTop: 40,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: "black",
+                          fontSize: 24,
+                          paddingBottom: 20,
+                        }}
+                      >
+                        🎉 {recentTweet.formattedCreatedDate}
+                      </Text>
+
+                      <Text
+                        style={{
+                          color: "black",
+                          fontSize: 20,
+                          textAlign: "center",
+                        }}
+                      >
+                        {recentTweet.info.text}
+                      </Text>
+
+                      <View
+                        style={{
+                          paddingTop: 20,
+                          flexDirection: "row",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text style={{ fontSize: 18, fontWeight: "300" }}>
+                          <Text style={{ fontWeight: "bold" }}>
+                            {recentTweet.info.public_metrics.retweet_count}
+                          </Text>
+                          <Text> Retweets</Text>
+                        </Text>
+                        <Text
+                          style={{
+                            paddingLeft: 20,
+                            fontSize: 18,
+                            fontWeight: "300",
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold" }}>
+                            {recentTweet.info.public_metrics.like_count}
+                          </Text>
+                          <Text> Likes</Text>
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                ) : null}
+              </View>
+            </View>
           </View>
         ) : error ? (
           <View>
