@@ -17,6 +17,8 @@ import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useDeferredValue, useEffect, useState } from "react";
 
+import { MaterialCommunityIcons } from "@expo/vector-icons/MaterialCommunityIcons";
+import { MaterialIcons } from "@expo/vector-icons";
 import PinnedTweetCard from "../components/PinnedTweetCard";
 import { StackNavigator } from "@react-navigation/stack";
 import { TWITTER_BEARER_TOKEN } from "@env";
@@ -358,7 +360,7 @@ export default function Profile(props) {
                   justifyContent: "center",
                   alignItems: "center",
                   // backgroundColor: PlatformColor("secondarySystemBackground"),
-                  backgroundColor: "ghostwhite",
+                  // backgroundColor: "mintcream",
                 }}
               >
                 {user.info.protected ? (
@@ -375,128 +377,97 @@ export default function Profile(props) {
                   </View>
                 ) : null}
                 {!recentTweet && !user.info.protected ? (
-                  <View>
-                    <View style={{ paddingTop: 40, flex: 1 }}>
-                      <Text style={{ fontSize: 24, fontWeight: "300" }}>
-                        @{user.info.username} hasn&apos;t tweeted.
-                      </Text>
-                    </View>
+                  <View style={{ paddingTop: 80 }}>
+                    <Text style={{ fontSize: 24, fontWeight: "300" }}>
+                      @{user.info.username} hasn&apos;t tweeted.
+                    </Text>
                   </View>
                 ) : null}
                 <View>
                   <View
                     style={{
                       flex: 1,
-                      paddingTop: 10,
                       // justifyContent: "center",
                       alignItems: "center",
                     }}
                   >
-                    {user.pinnedTweet.tweet ? (
-                      <View>
-                        <PinnedTweetCard
-                          props={{
-                            user: user,
-                            recentTweet: recentTweet,
-                            style: {
-                              paddingVertical: 20,
-                              paddingHorizontal: 30,
-                            },
+                    <ScrollView>
+                      {user.pinnedTweet.tweet ? (
+                        <View>
+                          <PinnedTweetCard props={{ user: user }} />
+                          <View
+                            style={{
+                              borderBottomColor: "lightgrey",
+                              borderBottomWidth: StyleSheet.hairlineWidth,
+                            }}
+                          />
+                        </View>
+                      ) : null}
+                    </ScrollView>
+                    {recentTweet && !user.info.protected ? (
+                      <ScrollView>
+                        <View
+                          style={{
+                            borderBottomColor: "lightgrey",
+                            borderBottomWidth: StyleSheet.hairlineWidth,
                           }}
                         />
-                      </View>
+                        <View>
+                          <View style={{ flexDirection: "column" }}>
+                            <Pressable
+                              style={[
+                                styles.button,
+                                {
+                                  paddingVertical: 5,
+                                  paddingHorizontal: 10,
+                                  backgroundColor: "black",
+                                  borderRadius: 100,
+                                },
+                              ]}
+                              onPress={() => {
+                                navigation.navigate("Tweets", {
+                                  id: user.info.id,
+                                });
+                              }}
+                            >
+                              <View
+                                style={{
+                                  flex: 1,
+                                  flexDirection: "row",
+                                  justifyContent: "center",
+                                  alignSelf: "center",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Text
+                                  style={[
+                                    {
+                                      fontSize: 14,
+                                      fontWeight: "bold",
+                                      paddingLeft: 8,
+                                      color: "white",
+                                      alignItems: "center",
+                                    },
+                                  ]}
+                                >
+                                  View All Tweets{" "}
+                                </Text>
+                                <View style={{ justifyContent: "center" }}>
+                                  <MaterialIcons
+                                    name="chevron-right"
+                                    size={28}
+                                    color="white"
+                                    style={{ height: 27 }}
+                                  />
+                                </View>
+                              </View>
+                            </Pressable>
+                          </View>
+                        </View>
+                      </ScrollView>
                     ) : null}
                   </View>
                 </View>
-                {/* {user.pinnedTweet.tweet ? (
-                  <View>
-                    <View
-                      style={{
-                        flex: 1,
-                        paddingTop: 10,
-                        // justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "black",
-                          fontSize: 18,
-                          paddingBottom: 20,
-                        }}
-                      >
-                        📌 {user.pinnedTweet.createdAt}
-                      </Text>
-
-                      <Text
-                        style={{
-                          color: "black",
-                          fontSize: 16,
-                          textAlign: "center",
-                        }}
-                      >
-                        {user.pinnedTweet.tweet.text}
-                      </Text>
-                    </View>
-                  </View>
-                ) : recentTweet ? (
-                  <View>
-                    <View
-                      style={{
-                        flex: 1,
-                        paddingTop: 10,
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "black",
-                          fontSize: 16,
-                          paddingBottom: 20,
-                        }}
-                      >
-                        🎉 {recentTweet.formattedCreatedDate}
-                      </Text>
-
-                      <Text
-                        style={{
-                          color: "black",
-                          fontSize: 16,
-                          textAlign: "center",
-                        }}
-                      >
-                        {recentTweet.info.text}
-                      </Text>
-
-                      <View
-                        style={{
-                          paddingTop: 20,
-                          flexDirection: "row",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Text style={{ fontSize: 14, fontWeight: "300" }}>
-                          <Text style={{ fontWeight: "bold" }}>
-                            {recentTweet.info.public_metrics.retweet_count}
-                          </Text>
-                          <Text> Retweets</Text>
-                        </Text>
-                        <Text
-                          style={{
-                            paddingLeft: 20,
-                            fontSize: 14,
-                            fontWeight: "300",
-                          }}
-                        >
-                          <Text style={{ fontWeight: "bold" }}>
-                            {recentTweet.info.public_metrics.like_count}
-                          </Text>
-                          <Text> Likes</Text>
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                ) : null} */}
               </View>
             </View>
           </View>

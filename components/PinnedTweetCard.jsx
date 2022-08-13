@@ -13,21 +13,17 @@ import {
   Text,
   View,
 } from "react-native";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { useDeferredValue, useEffect, useState } from "react";
-
-import { StackNavigator } from "@react-navigation/stack";
-import { TWITTER_BEARER_TOKEN } from "@env";
-import Timeline from "../screens/Timeline";
-import TweetsScreen from "../screens/Tweets";
-import axios from "axios";
-import moment from "moment";
 
 const PinnedTweetCard = (props) => {
   return (
     <>
-      <View style={[props.props.style, { backgroundColor: "lightgrey" }]}>
+      <View
+        style={{
+          borderBottomColor: "lightgrey",
+          borderBottomWidth: StyleSheet.hairlineWidth,
+        }}
+      />
+      <View style={[props.props.style, { paddingTop: 10 }]}>
         {props.props.user.pinnedTweet.tweet ? (
           <View
             style={{
@@ -40,7 +36,7 @@ const PinnedTweetCard = (props) => {
                 width: Dimensions.get("window").width,
               }}
             >
-              <View style={{ paddingHorizontal: 15 }}>
+              <View style={{ paddingLeft: 15, paddingRight: 10 }}>
                 <Image
                   style={{
                     width: 60,
@@ -71,6 +67,13 @@ const PinnedTweetCard = (props) => {
                 </View>
               </View>
             </View>
+            <View
+              style={{
+                paddingTop: 15,
+                borderBottomColor: "lightgrey",
+                borderBottomWidth: StyleSheet.hairlineWidth,
+              }}
+            />
           </View>
         ) : null}
       </View>

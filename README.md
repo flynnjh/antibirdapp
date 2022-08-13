@@ -4,7 +4,8 @@ The goal of this project is to make a Twitter client with React Native. This cli
 
 TODO:
 
-- Complete Profile View
+- Complete Profile View ✅
 - Complete Tweets View
 - Complete Timeline
 - Add search bar to set the username
+- Switch to a UI Library like React Native Paper — making my own styles is a pain (learnt a lot though lol).
