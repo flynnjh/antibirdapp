@@ -14,6 +14,7 @@ import {
 import { useDeferredValue, useEffect, useState } from "react";
 
 import { TWITTER_BEARER_TOKEN } from "@env";
+import TweetCard from "../components/TweetCard";
 import axios from "axios";
 import moment from "moment";
 
@@ -22,15 +23,12 @@ const Tweets = (props) => {
   const [isLoading, setLoading] = useState(true);
 
   const getUserTweets = (id) => {
-    const todaysDate = moment().subtract(1, "month").toISOString();
-
     axios
       .get(`https://api.twitter.com/2/users/${id}/tweets`, {
         params: {
           max_results: "100",
           "tweet.fields": "created_at,public_metrics,attachments",
           exclude: "retweets,replies",
-          start_time: todaysDate,
         },
         headers: {
           Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
@@ -43,28 +41,12 @@ const Tweets = (props) => {
   };
 
   useEffect(() => {
-    getUserTweets(props.route.params.id);
+    getUserTweets(props.route.params.user.info.id);
   }, []);
 
-  const Tweet = (item) => {
-    //TODO: MAKE THIS LOOK GOOD
-    return (
-      <View style={{ padding: 30, width: Dimensions.get("window").width - 30 }}>
-        <Text style={{ paddingTop: 20 }}>
-          {item.tweet.text} {"\n"}
-        </Text>
-        <Text>
-          {item.tweet.created_at} {"\n"}
-        </Text>
-        <Text>
-          <Text>{item.tweet.public_metrics.retweet_count} Retweets </Text>
-          <Text>{item.tweet.public_metrics.like_count} Likes </Text>
-        </Text>
-      </View>
-    );
-  };
-
-  const renderTweet = ({ item }) => <Tweet tweet={item} />;
+  const renderTweet = ({ item }) => (
+    <TweetCard props={{ user: props.route.params.user, tweet: item }} />
+  );
 
   return (
     <>
@@ -72,7 +54,6 @@ const Tweets = (props) => {
         <View
           style={{
             flex: 1,
-            padding: 20,
             alignItems: "center",
             justifyContent: "center",
           }}

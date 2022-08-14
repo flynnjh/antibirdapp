@@ -3,14 +3,14 @@ import { Platform, SafeAreaView, StyleSheet, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import ProfileScreen from "./screens/Profile";
 import TimelineScreen from "./screens/Timeline";
-import TweetsScreen from "./screens/Tweets";
+import UserTweets from "./screens/UserTweets";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 
 const ProfileStack = createStackNavigator();
 
 function ProfileStackScreen() {
-  const username = "awesomekling";
+  const username = "FUNKePills";
   return (
     <ProfileStack.Navigator>
       <ProfileStack.Screen
@@ -19,7 +19,7 @@ function ProfileStackScreen() {
         initialParams={{ username: username }}
         options={{ headerShown: false }}
       />
-      <ProfileStack.Screen name="Tweets" component={TweetsScreen} />
+      <ProfileStack.Screen name="Tweets" component={UserTweets} />
     </ProfileStack.Navigator>
   );
 }

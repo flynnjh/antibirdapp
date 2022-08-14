@@ -14,7 +14,7 @@ import {
   View,
 } from "react-native";
 
-const PinnedTweetCard = (props) => {
+const PinnedTweetCard = ({ props }) => {
   return (
     <>
       <View
@@ -23,8 +23,13 @@ const PinnedTweetCard = (props) => {
           borderBottomWidth: StyleSheet.hairlineWidth,
         }}
       />
-      <View style={[props.props.style, { paddingTop: 10 }]}>
-        {props.props.user.pinnedTweet.tweet ? (
+      <View
+        style={[
+          props.style,
+          { paddingTop: 10, width: Dimensions.get("window").width },
+        ]}
+      >
+        {props.user.pinnedTweet.tweet ? (
           <View
             style={{
               flexDirection: "column",
@@ -33,17 +38,16 @@ const PinnedTweetCard = (props) => {
             <View
               style={{
                 flexDirection: "row",
-                width: Dimensions.get("window").width,
               }}
             >
-              <View style={{ paddingLeft: 15, paddingRight: 10 }}>
+              <View style={{ paddingLeft: 15, paddingRight: 15 }}>
                 <Image
                   style={{
                     width: 60,
                     height: 60,
                     borderRadius: 60 / 2,
                   }}
-                  source={{ uri: props.props.user.profileImage }}
+                  source={{ uri: props.user.profileImage }}
                 />
               </View>
               <View>
@@ -54,16 +58,16 @@ const PinnedTweetCard = (props) => {
                   }}
                 >
                   <Text style={{ paddingRight: 5, fontWeight: "bold" }}>
-                    {props.props.user.info.name}
+                    {props.user.info.name}
                   </Text>
                   <Text style={{ paddingRight: 5 }}>
-                    @{props.props.user.info.username}
+                    @{props.user.info.username}
                   </Text>
                   <Text style={{ fontSize: 12 }}>📌 </Text>
-                  <Text>{props.props.user.pinnedTweet.createdAt}</Text>
+                  <Text>{props.user.pinnedTweet.createdAt}</Text>
                 </View>
-                <View style={{ width: Dimensions.get("window").width - 120 }}>
-                  <Text>{props.props.user.pinnedTweet.tweet.text}</Text>
+                <View style={{ width: Dimensions.get("window").width - 115 }}>
+                  <Text>{props.user.pinnedTweet.tweet.text}</Text>
                 </View>
               </View>
             </View>

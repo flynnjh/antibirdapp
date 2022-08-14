@@ -1,9 +1,7 @@
 import {
-  Button,
   Dimensions,
   FlatList,
   Image,
-  PixelRatio,
   Platform,
   PlatformColor,
   Pressable,
@@ -13,19 +11,15 @@ import {
   Text,
   View,
 } from "react-native";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { useDeferredValue, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { MaterialCommunityIcons } from "@expo/vector-icons/MaterialCommunityIcons";
 import { MaterialIcons } from "@expo/vector-icons";
-import PinnedTweetCard from "../components/PinnedTweetCard";
-import { StackNavigator } from "@react-navigation/stack";
+import PinnedCard from "../components/PinnedCard";
 import { TWITTER_BEARER_TOKEN } from "@env";
-import Timeline from "../screens/Timeline";
-import TweetsScreen from "../screens/Tweets";
+import TweetCard from "../components/TweetCard";
 import axios from "axios";
 import moment from "moment";
+import { useNavigation } from "@react-navigation/native";
 
 // TODO: Fix &amp; apprearing in Bio/Tweets
 // TODO: Implement Link Rendering and Opening
@@ -85,7 +79,6 @@ export default function Profile(props) {
         userProfileImage = userProfileImage + "400x400" + imageType;
 
         if (res.data.data[0].protected) {
-          console.log(res.data.data[0]);
           const pinnedInfo = {
             tweet: false,
           };
@@ -122,15 +115,7 @@ export default function Profile(props) {
                 if (res.data.meta.result_count === 0) {
                   return;
                 } else {
-                  const recentInfo = {
-                    createdAt: moment(res.data.data[0].created_at).format(
-                      "MMMM D, YYYY @ HH:MM"
-                    ),
-                    tweet: res.data.data[0],
-                    // isPinnedTweet: false,
-                  };
-
-                  setRecentTweet(recentInfo);
+                  setRecentTweet(res.data.data[0]);
                 }
               });
 
@@ -329,7 +314,7 @@ export default function Profile(props) {
                   <Pressable
                     style={[styles.button, { backgroundColor: "dodgerblue" }]}
                     onPress={() => {
-                      navigation.navigate("Tweets", { id: user.info.id });
+                      navigation.navigate("Tweets", { user: user });
                     }}
                   >
                     <Text
@@ -363,26 +348,6 @@ export default function Profile(props) {
                   // backgroundColor: "mintcream",
                 }}
               >
-                {user.info.protected ? (
-                  <View>
-                    <View style={{ flex: 1, padding: 30, paddingTop: 20 }}>
-                      <Text style={{ fontSize: 26, fontWeight: "bold" }}>
-                        These Tweets are protected.
-                      </Text>
-                      <Text style={{ fontSize: 20 }}>
-                        Only approved followers can see @{user.info.username}
-                        &apos;s Tweets.
-                      </Text>
-                    </View>
-                  </View>
-                ) : null}
-                {!recentTweet && !user.info.protected ? (
-                  <View style={{ paddingTop: 80 }}>
-                    <Text style={{ fontSize: 24, fontWeight: "300" }}>
-                      @{user.info.username} hasn&apos;t tweeted.
-                    </Text>
-                  </View>
-                ) : null}
                 <View>
                   <View
                     style={{
@@ -392,9 +357,32 @@ export default function Profile(props) {
                     }}
                   >
                     <ScrollView>
-                      {user.pinnedTweet.tweet ? (
+                      {user.info.protected ? (
                         <View>
-                          <PinnedTweetCard props={{ user: user }} />
+                          <View
+                            style={{ flex: 1, padding: 30, paddingTop: 20 }}
+                          >
+                            <Text style={{ fontSize: 26, fontWeight: "bold" }}>
+                              These Tweets are protected.
+                            </Text>
+                            <Text style={{ fontSize: 20 }}>
+                              Only approved followers can see @
+                              {user.info.username}
+                              &apos;s Tweets.
+                            </Text>
+                          </View>
+                        </View>
+                      ) : null}
+                      {!recentTweet && !user.info.protected ? (
+                        <View style={{ paddingTop: 80 }}>
+                          <Text style={{ fontSize: 24, fontWeight: "300" }}>
+                            @{user.info.username} hasn&apos;t tweeted.
+                          </Text>
+                        </View>
+                      ) : null}
+                      {user.pinnedTweet.tweet && !user.info.protected ? (
+                        <View>
+                          <PinnedCard props={{ user: user }} />
                           <View
                             style={{
                               borderBottomColor: "lightgrey",
@@ -403,22 +391,32 @@ export default function Profile(props) {
                           />
                         </View>
                       ) : null}
-                    </ScrollView>
-                    {recentTweet && !user.info.protected ? (
-                      <ScrollView>
+                      {recentTweet && !user.info.protected ? (
+                        <View>
+                          <TweetCard
+                            props={{ user: user, tweet: recentTweet }}
+                          />
+                          <View
+                            style={{
+                              borderBottomColor: "lightgrey",
+                              borderBottomWidth: StyleSheet.hairlineWidth,
+                            }}
+                          />
+                        </View>
+                      ) : null}
+                      {recentTweet && !user.info.protected ? (
                         <View
                           style={{
-                            borderBottomColor: "lightgrey",
-                            borderBottomWidth: StyleSheet.hairlineWidth,
+                            paddingVertical: 40,
+                            paddingHorizontal: 100,
                           }}
-                        />
-                        <View>
+                        >
                           <View style={{ flexDirection: "column" }}>
                             <Pressable
                               style={[
                                 styles.button,
                                 {
-                                  paddingVertical: 5,
+                                  paddingVertical: 4,
                                   paddingHorizontal: 10,
                                   backgroundColor: "black",
                                   borderRadius: 100,
@@ -426,7 +424,7 @@ export default function Profile(props) {
                               ]}
                               onPress={() => {
                                 navigation.navigate("Tweets", {
-                                  id: user.info.id,
+                                  user: user,
                                 });
                               }}
                             >
@@ -442,7 +440,7 @@ export default function Profile(props) {
                                 <Text
                                   style={[
                                     {
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       fontWeight: "bold",
                                       paddingLeft: 8,
                                       color: "white",
@@ -450,7 +448,7 @@ export default function Profile(props) {
                                     },
                                   ]}
                                 >
-                                  View All Tweets{" "}
+                                  View Recent Tweets{" "}
                                 </Text>
                                 <View style={{ justifyContent: "center" }}>
                                   <MaterialIcons
@@ -464,8 +462,8 @@ export default function Profile(props) {
                             </Pressable>
                           </View>
                         </View>
-                      </ScrollView>
-                    ) : null}
+                      ) : null}
+                    </ScrollView>
                   </View>
                 </View>
               </View>
