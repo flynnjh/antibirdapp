@@ -56,6 +56,7 @@ const Tweets = (props) => {
             flex: 1,
             alignItems: "center",
             justifyContent: "center",
+            backgroundColor: "white",
           }}
         >
           <FlatList

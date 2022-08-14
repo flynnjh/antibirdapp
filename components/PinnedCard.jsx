@@ -14,7 +14,11 @@ import {
   View,
 } from "react-native";
 
+import moment from "moment";
+
 const PinnedTweetCard = ({ props }) => {
+  const todaysDate = moment().toISOString();
+
   return (
     <>
       <View
@@ -64,7 +68,33 @@ const PinnedTweetCard = ({ props }) => {
                     @{props.user.info.username}
                   </Text>
                   <Text style={{ fontSize: 12 }}>📌 </Text>
-                  <Text>{props.user.pinnedTweet.createdAt}</Text>
+                  {moment(moment()).diff(
+                    props.user.pinnedTweet.tweet.created_at,
+                    "days"
+                  ) === 0 ? (
+                    <Text style={{ alignItems: "flex-end" }}>
+                      {moment(moment()).diff(
+                        props.user.pinnedTweet.tweet.created_at,
+                        "hours"
+                      ) > 0
+                        ? moment(moment()).diff(
+                            props.user.pinnedTweet.tweet.created_at,
+                            "hours"
+                          ) + "h"
+                        : moment(moment()).diff(
+                            props.user.pinnedTweet.tweet.created_at,
+                            "minutes"
+                          ) + "m"}
+                    </Text>
+                  ) : (
+                    <Text style={{ alignItems: "flex-end" }}>
+                      {moment(moment()).diff(
+                        props.user.pinnedTweet.tweet.created_at,
+                        "days"
+                      )}
+                      d
+                    </Text>
+                  )}
                 </View>
                 <View style={{ width: Dimensions.get("window").width - 115 }}>
                   <Text>{props.user.pinnedTweet.tweet.text}</Text>

@@ -373,7 +373,9 @@ export default function Profile(props) {
                           </View>
                         </View>
                       ) : null}
-                      {!recentTweet && !user.info.protected ? (
+                      {!recentTweet &&
+                      !user.info.protected &&
+                      !user.pinnedTweet ? (
                         <View style={{ paddingTop: 80 }}>
                           <Text style={{ fontSize: 24, fontWeight: "300" }}>
                             @{user.info.username} hasn&apos;t tweeted.

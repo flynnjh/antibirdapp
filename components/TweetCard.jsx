@@ -58,11 +58,27 @@ const TweetCard = ({ props }) => {
                     @{props.user.info.username}
                   </Text>
                   <Text style={{ paddingRight: 5 }}>//</Text>
-                  <Text style={{ alignItems: "flex-end" }}>
-                    {moment(props.tweet.created_at).format("MMM D, YY")}
-                  </Text>
+                  {moment(moment()).diff(props.tweet.created_at, "days") ===
+                  0 ? (
+                    <Text style={{ alignItems: "flex-end" }}>
+                      {moment(moment()).diff(props.tweet.created_at, "hours") >
+                      0
+                        ? moment(moment()).diff(
+                            props.tweet.created_at,
+                            "hours"
+                          ) + "h"
+                        : moment(moment()).diff(
+                            props.tweet.created_at,
+                            "minutes"
+                          ) + "m"}
+                    </Text>
+                  ) : (
+                    <Text style={{ alignItems: "flex-end" }}>
+                      {moment(moment()).diff(props.tweet.created_at, "days")}d
+                    </Text>
+                  )}
                 </View>
-                <View style={{ width: Dimensions.get("window").width - 100 }}>
+                <View style={{ width: Dimensions.get("window").width - 115 }}>
                   <Text>{props.tweet.text}</Text>
                 </View>
                 <View style={{ paddingTop: 5, flexDirection: "row" }}>
