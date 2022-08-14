@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 
+import { MaterialIcons } from "@expo/vector-icons";
 import moment from "moment";
 
 const PinnedTweetCard = ({ props }) => {
@@ -61,12 +62,31 @@ const PinnedTweetCard = ({ props }) => {
                     paddingBottom: 5,
                   }}
                 >
-                  <Text style={{ paddingRight: 5, fontWeight: "bold" }}>
-                    {props.user.info.name}
-                  </Text>
-                  <Text style={{ paddingRight: 5 }}>
-                    @{props.user.info.username}
-                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {props.user.info.name}
+                    </Text>
+                    {props.user.info.verified ? (
+                      <MaterialIcons
+                        name="verified"
+                        size={16}
+                        color="black"
+                        style={{ height: 15, paddingLeft: 3 }}
+                      />
+                    ) : null}
+                    <Text style={{ paddingLeft: 3, paddingRight: 5 }}>
+                      @{props.user.info.username}
+                    </Text>
+                  </View>
                   <Text style={{ fontSize: 12 }}>📌 </Text>
                   {moment(moment()).diff(
                     props.user.pinnedTweet.tweet.created_at,

@@ -10,7 +10,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 const ProfileStack = createStackNavigator();
 
 function ProfileStackScreen() {
-  const username = "FUNKePills";
+  const username = "modernvintageg";
   return (
     <ProfileStack.Navigator>
       <ProfileStack.Screen

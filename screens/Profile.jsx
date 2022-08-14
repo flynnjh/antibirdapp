@@ -25,7 +25,6 @@ import { useNavigation } from "@react-navigation/native";
 // TODO: Implement Link Rendering and Opening
 // TODO: Implement Tweet Image Rendering
 // TODO: Handle @handle Linking
-// POTENTIAL: Implement Banner Rendering
 
 export default function Profile(props) {
   const navigation = useNavigation();
@@ -210,14 +209,29 @@ export default function Profile(props) {
                       // alignItems: "center",
                     }}
                   >
-                    <Text
+                    <View
                       style={{
-                        fontSize: 0.2 * Dimensions.get("window").width - 60,
-                        fontWeight: "bold",
+                        flexDirection: "row",
+                        alignItems: "center",
                       }}
                     >
-                      {user.info.name}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 0.2 * Dimensions.get("window").width - 60,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {user.info.name}
+                      </Text>
+                      {user.info.verified ? (
+                        <MaterialIcons
+                          name="verified"
+                          size={16}
+                          color="black"
+                          style={{ height: 15, paddingLeft: 5 }}
+                        />
+                      ) : null}
+                    </View>
                     <View style={{ flexDirection: "row" }}>
                       <Text style={{ fontSize: 18, fontWeight: "300" }}>@</Text>
                       <Text
@@ -237,13 +251,13 @@ export default function Profile(props) {
                         </Text>
                       </View>
                     ) : null}
-                    {user.info.verified ? (
+                    {/* {user.info.verified ? (
                       <View style={{ paddingTop: 2 }}>
                         <Text style={{ fontSize: 14, fontWeight: "300" }}>
                           User is verified :O
                         </Text>
                       </View>
-                    ) : null}
+                    ) : null} */}
                   </View>
                 </View>
               </View>
@@ -375,7 +389,7 @@ export default function Profile(props) {
                       ) : null}
                       {!recentTweet &&
                       !user.info.protected &&
-                      !user.pinnedTweet ? (
+                      !user.pinnedTweet.tweet ? (
                         <View style={{ paddingTop: 80 }}>
                           <Text style={{ fontSize: 24, fontWeight: "300" }}>
                             @{user.info.username} hasn&apos;t tweeted.

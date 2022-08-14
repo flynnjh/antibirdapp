@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 
+import { MaterialIcons } from "@expo/vector-icons";
 import moment from "moment";
 
 const TweetCard = ({ props }) => {
@@ -46,17 +47,37 @@ const TweetCard = ({ props }) => {
                 <View
                   style={{
                     // backgroundColor: "red",
+                    alignItems: "center",
                     flexDirection: "row",
                     paddingBottom: 5,
                     width: Dimensions.get("window").width - 100,
                   }}
                 >
-                  <Text style={{ paddingRight: 5, fontWeight: "bold" }}>
-                    {props.user.info.name}
-                  </Text>
-                  <Text style={{ paddingRight: 5 }}>
-                    @{props.user.info.username}
-                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {props.user.info.name}
+                    </Text>
+                    {props.user.info.verified ? (
+                      <MaterialIcons
+                        name="verified"
+                        size={16}
+                        color="black"
+                        style={{ height: 15, paddingLeft: 3 }}
+                      />
+                    ) : null}
+                    <Text style={{ paddingLeft: 3, paddingRight: 5 }}>
+                      @{props.user.info.username}
+                    </Text>
+                  </View>
                   <Text style={{ paddingRight: 5 }}>//</Text>
                   {moment(moment()).diff(props.tweet.created_at, "days") ===
                   0 ? (
