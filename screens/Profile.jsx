@@ -75,6 +75,14 @@ export default function Profile(props) {
         const url = res.data.data[0].profile_image_url;
         let imageType = url.substring(url.length - 4);
         let userProfileImage = url.substring(0, url.length - 10);
+        {
+          imageType === "jpeg"
+            ? ((imageType = ".jpeg"),
+              (userProfileImage = url.substring(0, url.length - 11)))
+            : null;
+        }
+        console.log(imageType);
+        console.log(userProfileImage);
         userProfileImage = userProfileImage + "400x400" + imageType;
 
         if (res.data.data[0].protected) {
@@ -370,7 +378,10 @@ export default function Profile(props) {
                       alignItems: "center",
                     }}
                   >
-                    <ScrollView>
+                    <ScrollView
+                      showsHorizontalScrollIndicator={false}
+                      directionalLockEnabled={true}
+                    >
                       {user.info.protected ? (
                         <View>
                           <View

@@ -102,7 +102,7 @@ const TweetCard = ({ props }) => {
                 <View style={{ width: Dimensions.get("window").width - 115 }}>
                   <Text>{props.tweet.text}</Text>
                 </View>
-                <View style={{ paddingTop: 5, flexDirection: "row" }}>
+                <View style={{ paddingTop: 10, flexDirection: "row" }}>
                   <Text style={{ paddingRight: 5 }}>
                     {props.tweet.public_metrics.retweet_count} Retweets{" "}
                   </Text>
