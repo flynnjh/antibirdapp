@@ -6,31 +6,37 @@ import TimelineScreen from "./screens/Timeline";
 import UserTweets from "./screens/UserTweets";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
-
-const ProfileStack = createStackNavigator();
-
-function ProfileStackScreen() {
-  const username = "reckless";
-  return (
-    <ProfileStack.Navigator>
-      <ProfileStack.Screen
-        name={username}
-        component={ProfileScreen}
-        initialParams={{ username: username }}
-        options={{ headerShown: false }}
-      />
-      <ProfileStack.Screen name="Tweets" component={UserTweets} />
-    </ProfileStack.Navigator>
-  );
-}
+import { useState } from "react";
 
 export default function App() {
+  const username = "distantsynths";
+
   const Tab = createMaterialBottomTabNavigator();
+  const ProfileStack = createStackNavigator();
+
+  function ProfileStackScreen() {
+    return (
+      <ProfileStack.Navigator>
+        <ProfileStack.Screen
+          name={username}
+          component={ProfileScreen}
+          initialParams={{ username: username }}
+          options={{ headerShown: false }}
+        />
+        <ProfileStack.Screen name="Tweets" component={UserTweets} />
+      </ProfileStack.Navigator>
+    );
+  }
   return (
     <>
       <NavigationContainer>
         <Tab.Navigator>
-          <Tab.Screen name="Timeline" component={TimelineScreen} />
+          <Tab.Screen
+            name="Timeline"
+            component={TimelineScreen}
+            initialParams={{ username: username }}
+            options={{ headerShown: false }}
+          />
           <Tab.Screen name="Profile" component={ProfileStackScreen} />
         </Tab.Navigator>
       </NavigationContainer>

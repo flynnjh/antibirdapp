@@ -145,11 +145,21 @@ const PinnedTweetCard = ({ props }) => {
                 <View style={{ width: Dimensions.get("window").width - 115 }}>
                   <Text>{props.user.pinnedTweet.tweet.text}</Text>
                 </View>
+                <View style={{ paddingTop: 10, flexDirection: "row" }}>
+                  <Text style={{ paddingRight: 5 }}>
+                    {props.user.pinnedTweet.tweet.public_metrics.retweet_count}{" "}
+                    Retweets{" "}
+                  </Text>
+                  <Text>
+                    {props.user.pinnedTweet.tweet.public_metrics.like_count}{" "}
+                    Likes{" "}
+                  </Text>
+                </View>
               </View>
             </View>
             <View
               style={{
-                paddingTop: 20,
+                paddingTop: 15,
                 borderBottomColor: "lightgrey",
                 borderBottomWidth: StyleSheet.hairlineWidth,
               }}

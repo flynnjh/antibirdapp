@@ -45,7 +45,7 @@ export default function Profile(props) {
           "user.fields":
             "created_at,description,profile_image_url,protected,verified,public_metrics,entities",
           expansions: "pinned_tweet_id",
-          "tweet.fields": "author_id,created_at",
+          "tweet.fields": "author_id,created_at,public_metrics",
         },
         headers: {
           Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
@@ -81,8 +81,6 @@ export default function Profile(props) {
               (userProfileImage = url.substring(0, url.length - 11)))
             : null;
         }
-        console.log(imageType);
-        console.log(userProfileImage);
         userProfileImage = userProfileImage + "400x400" + imageType;
 
         if (res.data.data[0].protected) {
@@ -99,7 +97,6 @@ export default function Profile(props) {
             pinnedTweet: pinnedInfo,
           };
           setUser(userInfo);
-          setIsUser(true);
         } else {
           // gets users first five tweets, if meta.result_count is 0 then we know that the user actually doesn't have any tweets
 
@@ -177,7 +174,6 @@ export default function Profile(props) {
   return (
     <>
       <SafeAreaView style={[styles.container, styles.AndroidSafeArea]}>
-        {!isUser ? <Text>hello world</Text> : null}
         {user ? (
           <View
             style={{
@@ -259,13 +255,6 @@ export default function Profile(props) {
                         </Text>
                       </View>
                     ) : null}
-                    {/* {user.info.verified ? (
-                      <View style={{ paddingTop: 2 }}>
-                        <Text style={{ fontSize: 14, fontWeight: "300" }}>
-                          User is verified :O
-                        </Text>
-                      </View>
-                    ) : null} */}
                   </View>
                 </View>
               </View>
