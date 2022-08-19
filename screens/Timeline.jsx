@@ -14,7 +14,6 @@ import {
 import { useEffect, useState } from "react";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import PinnedCard from "../components/PinnedCard";
 import { TWITTER_BEARER_TOKEN } from "@env";
 import TweetCard from "../components/TweetCard";
 import axios from "axios";
@@ -35,6 +34,7 @@ const Timeline = (props) => {
       .get(`https://api.twitter.com/2/users/${user.id}/following`, {
         params: {
           max_results: user.public_metrics.following_count,
+          "user.fields": "created_at,profile_image_url,protected,verified",
         },
         headers: {
           Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
@@ -43,7 +43,7 @@ const Timeline = (props) => {
       .then((res) => {
         const userFollowing = res.data.data;
         let userFollowingTweets = new Array();
-        const endTime = moment().subtract(1, "days").toISOString();
+        const startTime = moment().subtract(1, "days").toISOString();
 
         // this isn't a fantastic way of doing following fetching,
         // because it very quickly rate limits me. though with twitter
@@ -51,18 +51,18 @@ const Timeline = (props) => {
 
         // NEW IDEA: Maybe user should 'follow' profiles themselves to cut down on requests
 
-        for (let u = 0; u < 1; u++) {
+        // TODO: organize tweets based on timestamp rather than user
+
+        for (let u = 0; u < user.public_metrics.following_count; u++) {
           axios
             .get(
               `https://api.twitter.com/2/users/${userFollowing[u].id}/tweets`,
               {
                 params: {
                   max_results: 10,
-                  end_time: endTime,
+                  start_time: startTime,
                   "tweet.fields":
                     "created_at,public_metrics,attachments,entities",
-                  "user.fields":
-                    "protected,verified,profile_image_url,public_metrics",
                   exclude: "retweets,replies",
                 },
                 headers: {
@@ -72,8 +72,23 @@ const Timeline = (props) => {
             )
             .then((res) => {
               for (let i = 0; i < res.data.data.length; i++) {
+                const url = userFollowing[u].profile_image_url;
+                let imageType = url.substring(url.length - 4);
+                let userProfileImage = url.substring(0, url.length - 10);
+                {
+                  imageType === "jpeg"
+                    ? ((imageType = ".jpeg"),
+                      (userProfileImage = url.substring(0, url.length - 11)))
+                    : null;
+                }
+                userProfileImage = userProfileImage + "400x400" + imageType;
+
+                const userInfo = {
+                  info: userFollowing[u],
+                  profileImage: userProfileImage,
+                };
                 const userTweet = {
-                  user: userFollowing[u],
+                  user: userInfo,
                   tweet: res.data.data[i],
                 };
                 userFollowingTweets.push(userTweet);
@@ -119,16 +134,26 @@ const Timeline = (props) => {
   }, [isLoading]);
 
   useEffect(() => {
-    console.log(userTimeline);
+    // console.log(userTimeline);
   }, [userTimeline]);
+
+  const renderTweet = ({ item }) => (
+    <TweetCard props={{ user: item.user, tweet: item.tweet }} />
+  );
 
   return (
     <>
       <SafeAreaView style={[styles.AndroidSafeArea, styles.container]}>
         {!isLoading ? (
           <View>
-            {user.public_metrics.following_count > 0 ? (
-              <Text>{user.id}</Text>
+            {user.public_metrics.following_count > 0 && userTimeline ? (
+              <FlatList
+                data={userTimeline}
+                renderItem={renderTweet}
+                keyExtractor={(item) => item.id}
+                directionalLockEnabled={true}
+                showsHorizontalScrollIndicator={false}
+              />
             ) : (
               <View>
                 <Text style={{ fontSize: 20, fontWeight: "300" }}>

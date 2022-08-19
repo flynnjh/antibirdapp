@@ -9,7 +9,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { useState } from "react";
 
 export default function App() {
-  const username = "distantsynths";
+  const username = "awesomekling";
 
   const Tab = createMaterialBottomTabNavigator();
   const ProfileStack = createStackNavigator();

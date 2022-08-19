@@ -13,7 +13,11 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import moment from "moment";
 
+// TODO: Fix username, handle and timestap row when it exceeds dimensions.window("screen").width
+
 const TweetCard = ({ props }) => {
+  // console.log(props);
+  // return null;
   return (
     <>
       <View
