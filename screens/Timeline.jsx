@@ -43,15 +43,12 @@ const Timeline = (props) => {
       .then((res) => {
         const userFollowing = res.data.data;
         let userFollowingTweets = new Array();
-        const startTime = moment().subtract(1, "days").toISOString();
+        const startTime = moment().subtract(12, "hours").toISOString();
 
-        // this isn't a fantastic way of doing following fetching,
-        // because it very quickly rate limits me. though with twitter
-        // not providing home_timeline without authentication i have to do it this way.
+        // this very quickly rate limits us.
+        // though with twitter not providing home_timeline without authentication i have to do it this way.
 
         // NEW IDEA: Maybe user should 'follow' profiles themselves to cut down on requests
-
-        // TODO: organize tweets based on timestamp rather than user
 
         for (let u = 0; u < user.public_metrics.following_count; u++) {
           axios
@@ -71,7 +68,7 @@ const Timeline = (props) => {
               }
             )
             .then((res) => {
-              for (let i = 0; i < res.data.data.length; i++) {
+              for (let i = 0; i < Object.keys(res.data.data).length; i++) {
                 const url = userFollowing[u].profile_image_url;
                 let imageType = url.substring(url.length - 4);
                 let userProfileImage = url.substring(0, url.length - 10);
@@ -93,7 +90,15 @@ const Timeline = (props) => {
                 };
                 userFollowingTweets.push(userTweet);
               }
+              userFollowingTweets.sort((a, b) => {
+                return (
+                  new Date(b.tweet.created_at) - new Date(a.tweet.created_at)
+                );
+              });
               setUserTimeline(userFollowingTweets);
+            })
+            .catch((err) => {
+              // Do nothing
             });
         }
         setLoading(false);
@@ -150,7 +155,7 @@ const Timeline = (props) => {
               <FlatList
                 data={userTimeline}
                 renderItem={renderTweet}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.tweet.id}
                 directionalLockEnabled={true}
                 showsHorizontalScrollIndicator={false}
               />
