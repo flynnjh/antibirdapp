@@ -10,7 +10,7 @@ If you would like to run this app yourself, please follow these steps:
 
 1. Ensure Node and Expo are installed.
 2. Clone the project.
-3. Change 'username' instead `App.jsx` to your desired username.
+3. Change 'username' inside `App.jsx` to your desired username.
 4. Run `npm i` to install the project's dependencies.
 5. Populate TWITTER_BEARER_TOKEN inside .env to the bearer token of your Twitter API app.
 6. Run either `npm run android` or `npm run ios`.
