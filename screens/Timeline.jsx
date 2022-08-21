@@ -101,12 +101,12 @@ const Timeline = (props) => {
               // Do nothing
             });
         }
-        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
         setError(error);
       });
+    setLoading(false);
   };
 
   const getUserInfo = (username) => {
